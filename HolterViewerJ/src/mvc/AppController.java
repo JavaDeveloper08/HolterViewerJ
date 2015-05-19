@@ -45,6 +45,9 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "Close Port":
 				cModel.close();
 				break;
+			case "Download":
+				cModel.createResultFile(cView.getFileName());
+				break;
 				
 		}
 	}

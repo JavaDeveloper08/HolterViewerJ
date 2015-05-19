@@ -260,6 +260,10 @@ public class AppView extends JFrame{
 		}
 	}
 	
+	public String getFileName(){
+		return appTextFileName.getText();
+	}
+	
 	public String getUserPort() {
 		return (String) appComboBoxPortName.getSelectedItem();
 	}

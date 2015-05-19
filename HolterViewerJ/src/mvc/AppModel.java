@@ -10,12 +10,14 @@ public class AppModel {
 	private COMPortAdapter PortCOM;
 	static private int portComBaudrate = 115200;
 	private FileAdapter resultFile;
+	private String csvCellSeparator = ",";
+	private String csvLineSeparator = System.lineSeparator();
 	
 	/** default constructors */
 	public AppModel (){
 		controller_ = null;
 		PortCOM =  new COMPortAdapter();
-		//resultFile = new FileAdapter();
+		resultFile = new FileAdapter();
 	}
 	
 	public void setController(AppController c){
@@ -39,12 +41,19 @@ public class AppModel {
 			e.printStackTrace();
 		}
 	}
-	
+		
 	public String[] scan(){
 		return PortCOM.getPortsNames();
 	}
 	
 	public boolean isConnected(){
 		return PortCOM.isConnected();
+	}
+	
+	public void createResultFile (String file_name){
+		String dataDirPath = System.getProperty("user.dir") + "/" + "data" + "/";
+		FileAdapter.createDirectory(dataDirPath);
+		resultFile = new FileAdapter(dataDirPath + file_name + ".csv", csvCellSeparator, csvLineSeparator);
+		resultFile.openOrCreateToWrite();
 	}
 }
