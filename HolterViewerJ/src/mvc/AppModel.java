@@ -3,6 +3,7 @@ package mvc;
 import java.util.*;
 import data.*;
 import adapters.*;
+import parsers.*;
 import jssc.SerialPortException;
 
 public class AppModel {
@@ -12,18 +13,25 @@ public class AppModel {
 	private FileAdapter resultFile;
 	private String csvCellSeparator = ",";
 	private String csvLineSeparator = System.lineSeparator();
+	private AppDataParser appParser;
 	
 	/** default constructors */
 	public AppModel (){
 		controller_ = null;
 		PortCOM =  new COMPortAdapter();
 		resultFile = new FileAdapter();
+		appParser = new AppDataParser();
 	}
 	
 	public void setController(AppController c){
 		this.controller_ = c;
 	}
 	
+	
+	public AppDataParser getAppParser() {
+		return appParser;
+	}
+
 	public void open(String portName){
 		try {
 			PortCOM.connect(portName, portComBaudrate, 8, 1, 0);

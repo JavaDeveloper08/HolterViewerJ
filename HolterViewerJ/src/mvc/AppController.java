@@ -55,7 +55,9 @@ public class AppController implements ActionListener, SerialPortEventListener {
 	@Override
 	public void serialEvent(SerialPortEvent e) {
 		if (e.isRXCHAR()) {
-			
+			if(cModel.getAppParser().is_header((byte)(e.getEventValue()))){
+				
+			}
 		}
 		
 	}
