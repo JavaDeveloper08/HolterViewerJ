@@ -46,7 +46,14 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				cModel.close();
 				break;
 			case "Download":
+				try{
 				cModel.createResultFile(cView.getFileName());
+				cModel.setPatient(cView.readPatientView());
+				cModel.writePatientdData();
+				} catch (AppException exception){
+					exception.show_exception(); 
+				}
+				
 				break;
 				
 		}
@@ -55,9 +62,6 @@ public class AppController implements ActionListener, SerialPortEventListener {
 	@Override
 	public void serialEvent(SerialPortEvent e) {
 		if (e.isRXCHAR()) {
-			if(cModel.getAppParser().is_header((byte)(e.getEventValue()))){
-				
-			}
 		}
 		
 	}

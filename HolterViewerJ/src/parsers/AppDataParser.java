@@ -59,7 +59,7 @@ public class AppDataParser {
 			time_data.setMinute_(b[6]);
 			time_data.setSecond_(b[7]);
 		}
-		else if(b[0] == 2){
+		else if(b[0] == 0){
 			int sample = (b[2] << 16) + (b[3] << 8) + b[4];
 			int timestamp = b[5]*3600000 + b[6]*600000 + b[7]*1000 + b[1]*8;
 			

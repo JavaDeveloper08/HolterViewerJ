@@ -3,15 +3,15 @@ package data;
 public class Patient {
 	private String name_;
 	private String last_name_;
-	private Double ID_num_;
+	private String ID_num_;
 	
 	public Patient(){
 		name_ = null;
 		last_name_ = null;
-		ID_num_ = 0.0;
+		ID_num_ = null;
 	}
 	
-	public Patient(String name, String last_name, Double ID_num, Boolean sex){
+	public Patient(String name, String last_name, String ID_num, Boolean sex){
 		name_ = name;
 		last_name_ = last_name;
 		ID_num_ = ID_num;
@@ -30,10 +30,10 @@ public class Patient {
 	public void setLast_name_(String last_name_) {
 		this.last_name_ = last_name_;
 	}
-	public Double getID_num_() {
+	public String getID_num_() {
 		return ID_num_;
 	}
-	public void setID_num_(Double iD_num_) {
+	public void setID_num_(String iD_num_) {
 		ID_num_ = iD_num_;
 	}
 	

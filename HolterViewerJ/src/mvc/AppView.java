@@ -208,7 +208,7 @@ public class AppView extends JFrame{
 	 * @return patient object
 	 * @throws AppException
 	 */
-	/*public Patient readPatientView() throws AppException {
+	public Patient readPatientView() throws AppException {
 		Patient newPatient = new Patient();
 		if(Utils.isText(appTextFieldName.getText()))
 			newPatient.setName_(appTextFieldName.getText());
@@ -231,16 +231,9 @@ public class AppView extends JFrame{
 		else {
 			throw new AppException("Podano z³y numer PESEL");
 		}
-		if(appRadioButtonMan.isSelected())
-			newPatient.setSex_(false);
-		else if(appRadioButtonWoman.isSelected())
-			newPatient.setSex_(true);
-		else {
-			throw new AppException("Proszê wybraæ p³eæ");
-		}
-		newPatient.setInsurance_(appComboBoxInsurance.getSelectedIndex());
+		
 		return newPatient;
-	}*/
+	}
 	
 	/**
 	 * @fn cleanPatientView()
@@ -260,7 +253,9 @@ public class AppView extends JFrame{
 		}
 	}
 	
-	public String getFileName(){
+	public String getFileName() throws AppException {
+		if(appTextFileName.getText().isEmpty())
+			throw new AppException("Podaj nazwê docelowego pliku");
 		return appTextFileName.getText();
 	}
 	
