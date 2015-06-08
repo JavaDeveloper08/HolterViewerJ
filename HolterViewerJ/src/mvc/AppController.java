@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 
 public class AppController implements ActionListener, SerialPortEventListener {
 	private AppModel cModel = null;
@@ -55,13 +56,20 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				}
 				
 				break;
-				
 		}
 	}
 
 	@Override
 	public void serialEvent(SerialPortEvent e) {
 		if (e.isRXCHAR()) {
+			cModel.readBytes();
+			if(cModel.getDataReadyFlag() == 1){
+				cView.setDateView(cModel.getExam_time());
+				cView.setTimeView(cModel.getExam_time());
+			}
+			else if(cModel.getDataReadyFlag() == 2){
+				cView.addSampleToChart(cModel.getSingle_sample());
+			}
 		}
 		
 	}

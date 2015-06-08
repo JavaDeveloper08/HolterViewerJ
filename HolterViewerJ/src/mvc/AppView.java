@@ -15,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
@@ -73,7 +74,7 @@ public class AppView extends JFrame{
 	private JLabel appLabelPreviewDate = new JLabel();
 	private JLabel appLabelPreviewTime = new JLabel();
 	/* chart */
-	private int appECGTraceMaxSize = 200;
+	private int appECGTraceMaxSize = 500;
 	private Chart2D appECGChart = new Chart2D();
 	private ITrace2D appECGTrace = new Trace2DLtd(appECGTraceMaxSize); 
 	
@@ -119,8 +120,8 @@ public class AppView extends JFrame{
 		JPanel row3 = new JPanel(new FlowLayout());
 		JPanel row4 = new JPanel(new FlowLayout());
 		
-		//appComboBoxPortName = new JComboBox<String>(this.communicator.scan());
 		row1.add(appButtonScanPort);
+		
 		row1.add(appComboBoxPortName);
 
 		row2.add(appButtonOpenPort);
@@ -168,8 +169,18 @@ public class AppView extends JFrame{
 		appExaminationDatePanel.add(appLabelPreviewTime);
 		appPreviewPanel.add(appExaminationDatePanel, BorderLayout.PAGE_END);
 		
-		appECGChart.addTrace(appECGTrace);
 		appECGChart.setBackground(Color.BLACK);
+		appECGChart.setGridColor(Color.DARK_GRAY);
+		appECGChart.getAxisX().setPaintGrid(true);
+		appECGChart.getAxisY().setPaintGrid(true);
+		appECGChart.getAxisX().setAxisTitle(new AxisTitle("Time[ms]"));
+		appECGChart.getAxisY().setAxisTitle(new AxisTitle("Signal[V]"));
+		
+		appECGTrace.setColor(Color.RED);
+		appECGTrace.setName("ECG Signal");
+		appECGTrace.setVisible(true);
+		appECGChart.addTrace(appECGTrace);
+		
 		appPreviewPanel.add(appECGChart, BorderLayout.CENTER);
 	}
 	
@@ -270,6 +281,10 @@ public class AppView extends JFrame{
 	
 	public void setTimeView(Time date){
 		appLabelPreviewTime.setText(date.getHour_() + "/" + date.getMinute_() + "/" + date.getSecond_());
+	}
+	
+	public void addSampleToChart(Sample s){
+		appECGChart.getTraces().iterator().next().addPoint(s.getTimestamp_(), s.getSignal_sample_());
 	}
 	
 	public void setController(AppController c) {

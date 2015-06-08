@@ -24,7 +24,7 @@ public class AppModel {
 	private String csvLineSeparator = System.lineSeparator();
 	
 	private AppDataParser appParser;
-	
+	private int dataReadyFlag;
 	
 	/** default constructors */
 	public AppModel (){
@@ -35,6 +35,7 @@ public class AppModel {
 		PortCOM =  new COMPortAdapter();
 		resultFile = new FileAdapter();
 		appParser = new AppDataParser();
+		dataReadyFlag = 0;
 	}
 	
 	public void setController(AppController c){
@@ -44,6 +45,18 @@ public class AppModel {
 	
 	public void setPatient(Patient patient) {
 		this.patient = patient;
+	}
+
+	public int getDataReadyFlag() {
+		return dataReadyFlag;
+	}
+	
+	public Time getExam_time() {
+		return exam_time;
+	}
+
+	public Sample getSingle_sample() {
+		return single_sample;
 	}
 
 	public void open(String portName){
@@ -70,6 +83,24 @@ public class AppModel {
 	
 	public boolean isConnected(){
 		return PortCOM.isConnected();
+	}
+	
+	public void readBytes () {
+		byte[] comPortFrame;
+		comPortFrame = PortCOM.readBytesFromPort();
+		appParser.parse(comPortFrame);
+		if(appParser.getHeader_recevied() == true){
+			appParser.setHeader_recevied(false);
+			exam_time = appParser.getTime_data();
+			dataReadyFlag = 1;
+		}
+		else if (appParser.getSample_recevied() == true){
+			appParser.setSample_recevied(false);
+			single_sample = appParser.getSample_data();
+			dataReadyFlag = 2;
+		}
+		else
+			dataReadyFlag = 0;
 	}
 	
 	public void createResultFile (String file_name){

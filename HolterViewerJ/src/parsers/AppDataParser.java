@@ -6,13 +6,15 @@ public class AppDataParser {
 	private Time time_data;
 	private Sample sample_data;
 	private static final byte[] header_tab = new byte[] {(byte)(0xA5), 0x5A, (byte)(0xFE)};
-	private byte[] header_check = new byte[3];
-	private static final int data_frame_length = 7;
+	private static final int data_frame_length = 11;
+	private Boolean header_recevied;
+	private Boolean sample_recevied;
 	
 	public AppDataParser(){
-		header_check[0] = 0;
-		header_check[1] = 0;
-		header_check[2] = 0;
+		time_data = new Time();
+		sample_data = new Sample();
+		header_recevied = false;
+		sample_recevied = false;
 	}
 
 	public Time getTime_data() {
@@ -31,40 +33,61 @@ public class AppDataParser {
 		this.sample_data = sample_data;
 	}
 	
-	public void clean_header_check_tab (){
-		header_check[0] = 0;
-		header_check[1] = 0;
-		header_check[2] = 0;
+	public void setHeader_recevied(Boolean header_recevied) {
+		this.header_recevied = header_recevied;
 	}
-	
-	public boolean is_header(byte b){
-		header_check[0] = header_check[1];
-		header_check[1] = header_check[2];
-		header_check[2] = b;
-		if(header_check.equals(header_tab))
-			return true;
-		
-		return false;
+
+	public Boolean getHeader_recevied() {
+		return header_recevied;
+	}
+
+	public Boolean getSample_recevied() {
+		return sample_recevied;
+	}
+
+	public void setSample_recevied(Boolean sample_recevied) {
+		this.sample_recevied = sample_recevied;
+	}
+
+	private boolean is_header(byte b[]){
+		if(b[0] == header_tab[0]){
+			if(b[1] == header_tab[1]){
+				if(b[2] == header_tab[2])
+					return true;
+				else
+					return false;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
 	}
 	
 	public void parse(byte [] b){
 		if(b.length != data_frame_length)
 			return;
-		if(b[0] == 1){
-			time_data.setDay_(b[1]);
-			time_data.setMonth_(b[2]);
-			int year = (b[3] << 8) + b[4];
-			time_data.setYear_(year);
-			time_data.setHour_(b[5]);
-			time_data.setMinute_(b[6]);
-			time_data.setSecond_(b[7]);
-		}
-		else if(b[0] == 0){
-			int sample = (b[2] << 16) + (b[3] << 8) + b[4];
-			int timestamp = b[5]*3600000 + b[6]*600000 + b[7]*1000 + b[1]*8;
-			
-			sample_data.setSignal_sample_(sample);
-			sample_data.setTimestamp_(timestamp);
+		if(is_header(b)){
+			if(b[3] == 1){
+				Time read_time_data  = new Time();
+				read_time_data.setDay_(b[4]);
+				read_time_data.setMonth_(b[5]);
+				int year = (((int)(b[6] & 0xFF)) << 8) | (int)(b[7]) & 0xFF;
+				read_time_data.setYear_(year);
+				read_time_data.setHour_(b[8]);
+				read_time_data.setMinute_(b[9]);
+				read_time_data.setSecond_(b[10]);
+				time_data = read_time_data;
+				header_recevied = true;
+			}
+			else if(b[3] == 0){
+				int sample = (b[5] << 16) + (b[6] << 8) + b[7];
+				int timestamp = b[8]*3600000 + b[9]*600000 + b[10]*1000 + b[4]*8;
+				
+				sample_data.setSignal_sample_(sample);
+				sample_data.setTimestamp_(timestamp);
+				sample_recevied = true;
+			}
 		}
 	}
 }

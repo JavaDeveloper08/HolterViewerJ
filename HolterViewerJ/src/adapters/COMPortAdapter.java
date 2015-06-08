@@ -103,4 +103,14 @@ public class COMPortAdapter{
     public void writeToPort(String s) throws SerialPortException {
     	this.serialPort.writeString(s);
     } 
+    
+    public byte[] readBytesFromPort(){
+    	byte[] b = null;
+		try {
+			b = this.serialPort.readBytes();
+		} catch (SerialPortException e) {
+			e.printStackTrace();
+		}
+	return b;	
+    }
 }
