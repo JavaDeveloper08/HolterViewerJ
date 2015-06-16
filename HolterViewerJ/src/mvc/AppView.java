@@ -19,6 +19,9 @@ import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class AppView extends JFrame{
 
 	private static final long serialVersionUID = 1L;
