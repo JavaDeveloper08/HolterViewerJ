@@ -8,8 +8,6 @@ import parsers.*;
 import jssc.SerialPortException;
 
 public class AppModel {
-	private static final Object[] String = null;
-
 	private AppController controller;
 	
 	private Patient patient;

@@ -65,26 +65,30 @@ public class AppDataParser {
 	}
 	
 	public void parse(byte [] b){
-		if(b.length != data_frame_length)
+		if((b == null) || (b.length != data_frame_length)){
+			header_recevied = false;
+			sample_recevied = false;
 			return;
+		}
+			
 		if(is_header(b)){
 			if(b[3] == 1){
 				Time read_time_data  = new Time();
 				read_time_data.setDay_(b[4]);
 				read_time_data.setMonth_(b[5]);
-				int year = (((int)(b[6] & 0xFF)) << 8) | (int)(b[7]) & 0xFF;
+				int year = (((int)(b[6] & 0xFF)) << 8) | ((int)(b[7])) & 0xFF;
 				read_time_data.setYear_(year);
-				read_time_data.setHour_(b[8]);
-				read_time_data.setMinute_(b[9]);
-				read_time_data.setSecond_(b[10]);
+				read_time_data.setHour_((int)(b[8] & 0xFF));
+				read_time_data.setMinute_((int)(b[9] & 0xFF));
+				read_time_data.setSecond_((int)(b[10] & 0xFF));
 				time_data = read_time_data;
 				header_recevied = true;
 			}
 			else if(b[3] == 0){
-				int sample = (((int)(b[5]) & 0xFF) << 16) + (((int)(b[6]) & 0xFF) << 8) + ((int)(b[7])) & 0xFF;
-				int timestamp = (((int)(b[8])) & 0xFF)*3600000 + (((int)(b[9])) & 0xFF)*600000 
-						+ (((int)(b[10])) & 0xFF)*1000 + (((int)(b[4])) & 0xFF)*8;
-				
+				int sample = ((((int)(b[5])) & 0xFF) << 16) + ((((int)(b[6])) & 0xFF) << 8) + (((int)(b[7])) & 0xFF);
+				double timestamp = ((((int)(b[8])) & 0xFF) << 16) + ((((int)(b[9])) & 0xFF) << 8) + (((int)(b[10])) & 0xFF)
+						+ (((int)(b[4])) & 0xFF)*0.125;
+	
 				sample_data.setSignal_sample_(sample);
 				sample_data.setTimestamp_(timestamp);
 				sample_recevied = true;

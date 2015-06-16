@@ -12,6 +12,7 @@ import javax.swing.text.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.EmptyBorder;
 
+import adapters.SimpleChartAdapter;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
@@ -28,6 +29,7 @@ public class AppView extends JFrame{
 	private JMenu appMenu = new JMenu("Menu");
 	private JMenuItem appMenuClose = new JMenuItem("Close");
 	private JMenuItem appMenuAbout = new JMenuItem("About");
+	private JMenuItem appMenuViewer = new JMenuItem("Viewer");
 	
 	/** about frame */
 	private JFrame appAboutFrame = new JFrame("About");
@@ -80,7 +82,7 @@ public class AppView extends JFrame{
 	private JLabel appLabelFileName = new JLabel("File name:");
 	/* text fields */
 	private JTextField appTextFileName = new JTextField(15);
-	//TODO add progressive bar
+	private JProgressBar appProgressBar = new JProgressBar();
 	
 	/** preview panel */
 	/* labels */
@@ -88,8 +90,7 @@ public class AppView extends JFrame{
 	private JLabel appLabelPreviewTime = new JLabel();
 	/* chart */
 	private int appECGTraceMaxSize = 500;
-	private Chart2D appECGChart = new Chart2D();
-	private ITrace2D appECGTrace = new Trace2DLtd(appECGTraceMaxSize); 
+	private SimpleChartAdapter appECGChart = new SimpleChartAdapter(appECGTraceMaxSize); 
 	
 	/** default constructors (all views set) */
 	public AppView(){
@@ -103,6 +104,7 @@ public class AppView extends JFrame{
 		/** set menu view */
 		appMenuBar.add(appMenu);
 		appMenu.add(appMenuAbout);
+		appMenu.add(appMenuViewer);
 		appMenu.add(appMenuClose);
 		setJMenuBar(appMenuBar);
 		
@@ -133,7 +135,16 @@ public class AppView extends JFrame{
 		appActionPanel.setLayout(new BorderLayout());
 		
 		/* download view panel  */
-		appDownloadDataPanel.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
+		appDownloadDataPanel.setLayout(new BoxLayout(appDownloadDataPanel, BoxLayout.Y_AXIS));
+		
+		JPanel DOrow1 = new JPanel(new FlowLayout());
+		JPanel DOrow2 = new JPanel(new FlowLayout());
+		
+		DOrow1.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
+		DOrow2.add(appProgressBar);
+		
+		appDownloadDataPanel.add(DOrow1);
+		appDownloadDataPanel.add(DOrow2);
 		appActionPanel.add(appDownloadDataPanel, BorderLayout.PAGE_END);
 		
 		JPanel appActionRowPanel = new JPanel(new GridLayout(1,2));
@@ -211,19 +222,13 @@ public class AppView extends JFrame{
 		appExaminationDatePanel.add(appLabelPreviewTime);
 		appPreviewPanel.add(appExaminationDatePanel, BorderLayout.PAGE_END);
 		
-		appECGChart.setBackground(Color.BLACK);
-		appECGChart.setGridColor(Color.DARK_GRAY);
-		appECGChart.getAxisX().setPaintGrid(true);
-		appECGChart.getAxisY().setPaintGrid(true);
-		appECGChart.getAxisX().setAxisTitle(new AxisTitle("Time[ms]"));
-		appECGChart.getAxisY().setAxisTitle(new AxisTitle("Signal[V]"));
+		appECGChart.setXLabel("Time[ms]");
+		appECGChart.setYLabel("Signal[V]");
+		appECGChart.setGrid(true);
 		
-		appECGTrace.setColor(Color.RED);
-		appECGTrace.setName("ECG Signal");
-		appECGTrace.setVisible(true);
-		appECGChart.addTrace(appECGTrace);
-		
-		appPreviewPanel.add(appECGChart, BorderLayout.CENTER);
+		appECGChart.createNewTraceLtd(Color.RED, "ECG Signal");
+
+		appPreviewPanel.add(appECGChart.getChartPanel(), BorderLayout.CENTER);
 	}
 	
 	/** ABOUT FRAME */
@@ -330,20 +335,21 @@ public class AppView extends JFrame{
 	
 	/** PREVIEW VIEW */
 	public void setDateView(Time date){
-		appLabelPreviewDate.setText(date.getYear_() + "/" + date.getMonth_() + "/" + date.getDay_());
+		appLabelPreviewDate.setText(date.getYear_() + "/" + Integer.toHexString(date.getMonth_()) + "/" + Integer.toHexString(date.getDay_()));
 	}
 	
 	public void setTimeView(Time date){
-		appLabelPreviewTime.setText(date.getHour_() + "/" + date.getMinute_() + "/" + date.getSecond_());
+		appLabelPreviewTime.setText(Integer.toHexString(date.getHour_()) + "/" + Integer.toHexString(date.getMinute_()) + "/" + Integer.toHexString(date.getSecond_()));
 	}
 	
 	public void addSampleToChart(Sample s){
-		appECGChart.getTraces().iterator().next().addPoint(s.getTimestamp_(), s.getSignal_sample_());
+		appECGChart.addPoint(s.getSignal_sample_());
 	}
 	
 	public void setController(AppController c) {
 		appMenuAbout.addActionListener(c);
 		appMenuClose.addActionListener(c);
+		appMenuViewer.addActionListener(c);
 		appButtonPatientClear.addActionListener(c);
 		appButtonScanPort.addActionListener(c);
 		appButtonOpenPort.addActionListener(c);

@@ -34,6 +34,9 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "About":
 				cView.setAboutFrame();
 				break;
+			case "Viewer":
+				//cView.setViewerFrame();
+				break;
 			case "Clear":
 				cView.cleanPatientView();
 				break;

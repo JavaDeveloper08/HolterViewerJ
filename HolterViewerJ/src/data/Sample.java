@@ -2,7 +2,7 @@ package data;
 
 public class Sample {
 	private int signal_sample_;
-	private int timestamp_;
+	private double timestamp_;
 	
 	public Sample(){
 		super();
@@ -23,11 +23,11 @@ public class Sample {
 		this.signal_sample_ = signal_sample_;
 	}
 
-	public int getTimestamp_() {
+	public double getTimestamp_() {
 		return timestamp_;
 	}
 
-	public void setTimestamp_(int timestamp_) {
+	public void setTimestamp_(double timestamp_) {
 		this.timestamp_ = timestamp_;
 	}
 
@@ -49,6 +49,6 @@ public class Sample {
 	
 	@Override
 	public String toString() {
-		return timestamp_ + "," + signal_sample_;
+		return Double.toString(timestamp_) + "," + signal_sample_;
 	}
 }

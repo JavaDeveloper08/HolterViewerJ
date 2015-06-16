@@ -29,12 +29,11 @@ public class SimpleChartAdapter extends TimerTask implements MouseListener{
         setYLabel("");
      
         timer = new Timer();
-        timer.schedule(this, 10, 250);
+        timer.schedule(this, 10, 1000);
     }
     
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		chart.validate();
 		chart.updateUI();
 	}
