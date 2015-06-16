@@ -42,18 +42,21 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			case "Open Port":
 				cModel.open(cView.getUserPort());
+				cView.openPortAction();
 				break;
 			case "Close Port":
 				cModel.close();
+				cView.closePortAction();
 				break;
 			case "Download":
 				try{
 				cModel.createResultFile(cView.getFileName());
 				cModel.setPatient(cView.readPatientView());
-				cModel.writePatientdData();
+				cModel.writePatientdDataToFile();
 				} catch (AppException exception){
 					exception.show_exception(); 
 				}
+				cModel.setDownloadDataFlag(true);
 				
 				break;
 		}
@@ -70,6 +73,9 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			else if(cModel.getDataReadyFlag() == 2){
 				cView.addSampleToChart(cModel.getSingle_sample());
 			}
+			
+			if(cModel.getDownloadDataFlag() == true)
+				cModel.writeDataToFile();
 		}
 		
 	}
