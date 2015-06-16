@@ -25,6 +25,7 @@ public class AppModel {
 	
 	private AppDataParser appParser;
 	private int dataReadyFlag;
+	private boolean downloadDataFlag;
 	
 	/** default constructors */
 	public AppModel (){
@@ -36,12 +37,13 @@ public class AppModel {
 		resultFile = new FileAdapter();
 		appParser = new AppDataParser();
 		dataReadyFlag = 0;
+		downloadDataFlag = false;
 	}
 	
+	/** setters and getters */
 	public void setController(AppController c){
 		this.controller = c;
 	}
-	
 	
 	public void setPatient(Patient patient) {
 		this.patient = patient;
@@ -57,6 +59,14 @@ public class AppModel {
 
 	public Sample getSingle_sample() {
 		return single_sample;
+	}
+	
+	public boolean getDownloadDataFlag() {
+		return downloadDataFlag;
+	}
+
+	public void setDownloadDataFlag(boolean downloadDataFlag) {
+		this.downloadDataFlag = downloadDataFlag;
 	}
 
 	public void open(String portName){
@@ -103,6 +113,15 @@ public class AppModel {
 			dataReadyFlag = 0;
 	}
 	
+	public void sendBytes (String command) {
+		switch(command){
+		case "":
+			System.exit(0);
+			break;
+		}
+			
+	}
+	
 	public void createResultFile (String file_name){
 		String dataDirPath = System.getProperty("user.dir") + "/" + "data" + "/";
 		FileAdapter.createDirectory(dataDirPath);
@@ -110,8 +129,18 @@ public class AppModel {
 		resultFile.openOrCreateToWrite();
 	}
 	
-	public void writePatientdData () {
+	public void writePatientdDataToFile () {
 		String[] p = {patient.getName_(),patient.getLast_name_(),patient.getID_num_()};
 		resultFile.writeCSVLine(p);
 	}
+	
+	public void writeDataToFile() {
+		if(dataReadyFlag == 1){
+			resultFile.writeLine(exam_time.toString());
+		}
+		else if(dataReadyFlag == 2) {
+			resultFile.writeLine(single_sample.toString());
+		}
+	}
+	
 }

@@ -19,9 +19,6 @@ import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class AppView extends JFrame{
 
 	private static final long serialVersionUID = 1L;
@@ -44,7 +41,10 @@ public class AppView extends JFrame{
 	private JPanel appLeftPanel = new JPanel();
 	private JPanel appRightPanel = new JPanel();
 	private JPanel appPatientPanel = new JPanel();
-	private JPanel appDownloadPanel = new JPanel();
+	private JPanel appActionPanel = new JPanel();
+	private JPanel appComPortPanel = new JPanel();
+	private JPanel appCommandPanel = new JPanel();
+	private JPanel appDownloadDataPanel = new JPanel();
 	private JPanel appPreviewPanel = new JPanel();
 	
 	/** patient panel components */
@@ -59,18 +59,28 @@ public class AppView extends JFrame{
 	/* action button */
 	private JButton appButtonPatientClear = new JButton("Clear");
 	
-	/** download panel */
+	/** action panel components */
+	/** port com panel */
 	/* buttons */
 	private JButton appButtonScanPort = new JButton("Scan");
 	private JButton appButtonOpenPort = new JButton("Open Port");
 	private JButton appButtonClosePort = new JButton("Close Port");
+	private JLabel appLabelPortOpen = new JLabel("Port open");
+	/* combo box */
+	private JComboBox<String> appComboBoxPortName = new JComboBox<String>();
+	
+	/** command panel */
+	/* buttons */
 	private JButton appButtonLoadData = new JButton("Download");
+	private JButton appButtonDataStream = new JButton("Stream data");
+	private JButton appButtonDataSave = new JButton("Save data");
+	
+	/** download panel */
 	/*labels */
 	private JLabel appLabelFileName = new JLabel("File name:");
 	/* text fields */
 	private JTextField appTextFileName = new JTextField(15);
-	/* combo box */
-	private JComboBox<String> appComboBoxPortName = new JComboBox<String>();
+	//TODO add progressive bar
 	
 	/** preview panel */
 	/* labels */
@@ -98,9 +108,13 @@ public class AppView extends JFrame{
 		
 		/** set main view panels */
 		appPatientPanel.setBorder(BorderFactory.createTitledBorder("Patient"));
-		appDownloadPanel.setBorder(BorderFactory.createTitledBorder("Download data"));
+		appActionPanel.setBorder(BorderFactory.createTitledBorder("Action"));
+		appComPortPanel.setBorder(BorderFactory.createTitledBorder("PortCOM"));
+		appCommandPanel.setBorder(BorderFactory.createTitledBorder("Command"));
+		appDownloadDataPanel.setBorder(BorderFactory.createTitledBorder("Download"));
 		appPreviewPanel.setBorder(BorderFactory.createTitledBorder("ECG signal"));
 		
+		//TODO add split!!!
 		GridLayout appPanelsLayout = new GridLayout(1,2);
 		this.setLayout(appPanelsLayout);
 		this.add(appLeftPanel);
@@ -109,36 +123,60 @@ public class AppView extends JFrame{
 		GridLayout appLeftPanelLayout = new GridLayout(2,1);
 		appLeftPanel.setLayout(appLeftPanelLayout);
 		appLeftPanel.add(appPatientPanel);
-		appLeftPanel.add(appDownloadPanel);
+		appLeftPanel.add(appActionPanel);
 		
 		GridLayout appRightPanelLayout = new GridLayout(1,1);
 		appRightPanel.setLayout(appRightPanelLayout);
 		appRightPanel.add(appPreviewPanel);
 		
-		/** set download view panel */
-		appDownloadPanel.setLayout(new BoxLayout(appDownloadPanel, BoxLayout.Y_AXIS));
+		/** set action view panel */
+		appActionPanel.setLayout(new BorderLayout());
+		
+		/* download view panel  */
+		appDownloadDataPanel.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
+		appActionPanel.add(appDownloadDataPanel, BorderLayout.PAGE_END);
+		
+		JPanel appActionRowPanel = new JPanel(new GridLayout(1,2));
+		
+		appActionRowPanel.add(appComPortPanel);
+		appActionRowPanel.add(appCommandPanel);
+		
+		/* com port view panel */
+		appComPortPanel.setLayout(new BoxLayout(appComPortPanel, BoxLayout.Y_AXIS));
 
-		JPanel row1 = new JPanel(new FlowLayout());
-		JPanel row2 = new JPanel(new FlowLayout());
-		JPanel row3 = new JPanel(new FlowLayout());
-		JPanel row4 = new JPanel(new FlowLayout());
+		JPanel CProw1 = new JPanel(new FlowLayout());
+		JPanel CProw2 = new JPanel(new FlowLayout());
+		JPanel CProw3 = new JPanel(new FlowLayout());
 		
-		row1.add(appButtonScanPort);
-		
-		row1.add(appComboBoxPortName);
+		CProw1.add(appButtonScanPort);
+		CProw1.add(appComboBoxPortName);
 
-		row2.add(appButtonOpenPort);
-		row2.add(appButtonClosePort);
+		appLabelPortOpen.setVisible(false);
+		CProw2.add(appLabelPortOpen);
 		
-		row3.add(appLabelFileName);
-		row3.add(appTextFileName);
+		CProw3.add(appButtonOpenPort);
+		appButtonClosePort.setEnabled(false);
+		CProw3.add(appButtonClosePort);
 		
-		row4.add(appButtonLoadData);
+		appComPortPanel.add(CProw1);
+		appComPortPanel.add(CProw2);
+		appComPortPanel.add(CProw3);
 		
-		appDownloadPanel.add(row1);
-		appDownloadPanel.add(row2);
-		appDownloadPanel.add(row3);
-		appDownloadPanel.add(row4);
+		/* command view panel */
+		appCommandPanel.setLayout(new BoxLayout(appCommandPanel, BoxLayout.Y_AXIS));
+		JPanel Crow1 = new JPanel(new FlowLayout());
+		JPanel Crow2 = new JPanel(new FlowLayout());
+		JPanel Crow3 = new JPanel(new FlowLayout());
+		
+		Crow1.add(appButtonDataStream);
+		Crow2.add(appButtonDataSave);
+		Crow3.add(appButtonLoadData);
+		
+		appCommandPanel.add(Crow1);
+		appCommandPanel.add(Crow2);
+		appCommandPanel.add(Crow3);
+		
+		appActionPanel.add(appActionRowPanel);
 		
 		/** set patient view panel */
 		appPatientPanel.setLayout(new BorderLayout());
@@ -156,7 +194,8 @@ public class AppView extends JFrame{
 		appPatientPanel.add(appPatientDataPanel, BorderLayout.CENTER);
 		
 		JPanel appActionBar1 = new JPanel();
-		appActionBar1.setLayout(new GridLayout(1,1));
+		appActionBar1.setLayout(new BoxLayout(appActionBar1, BoxLayout.X_AXIS));
+		//TODO add gap
 		appActionBar1.add(appButtonPatientClear);
 		appPatientPanel.add(appActionBar1, BorderLayout.PAGE_END);
 		
@@ -259,7 +298,7 @@ public class AppView extends JFrame{
 		appTextFieldID.setText("");
 	}
 	
-	/** DOWNLOAD VIEW */
+	/** ACTION VIEW */
 	public void setPortNames(String[] tab) {
 		appComboBoxPortName.removeAllItems();
 		for (int i = 0; i < tab.length; i++) {
@@ -275,6 +314,18 @@ public class AppView extends JFrame{
 	
 	public String getUserPort() {
 		return (String) appComboBoxPortName.getSelectedItem();
+	}
+	
+	public void openPortAction(){
+		appButtonClosePort.setEnabled(true);
+		appButtonOpenPort.setEnabled(false);
+		appLabelPortOpen.setVisible(true);
+	}
+	
+	public void closePortAction(){
+		appButtonOpenPort.setEnabled(true);
+		appButtonClosePort.setEnabled(false);
+		appLabelPortOpen.setVisible(false);
 	}
 	
 	/** PREVIEW VIEW */
@@ -296,7 +347,10 @@ public class AppView extends JFrame{
 		appButtonPatientClear.addActionListener(c);
 		appButtonScanPort.addActionListener(c);
 		appButtonOpenPort.addActionListener(c);
+		appButtonClosePort.addActionListener(c);
+		appButtonDataStream.addActionListener(c);
+		appButtonDataSave.addActionListener(c);
 		appButtonLoadData.addActionListener(c);
-	}
+		}
 
 }

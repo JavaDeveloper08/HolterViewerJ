@@ -1,5 +1,10 @@
 package mvc;
 
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 /**
  * @class Utils
  * @brief class contains static utils methods for application
@@ -41,5 +46,14 @@ public class Utils {
 					return false;
 		}
 		return true;
+	}
+	
+	static JPanel createLabelTextFieldPanel (JLabel label, JTextField text, int gap) {
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+		//TODO add gap
+		p.add(label);
+		p.add(text);
+		return p;
 	}
 }
