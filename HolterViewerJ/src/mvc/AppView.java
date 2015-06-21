@@ -2,23 +2,14 @@ package mvc;
 
 import data.*;
 
-import java.util.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.text.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.border.EmptyBorder;
 
 import adapters.SimpleChartAdapter;
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.IAxis.AxisTitle;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 public class AppView extends JFrame{
 
@@ -40,7 +31,9 @@ public class AppView extends JFrame{
 	public static final String appAboutText = "HolterViewer\n";
 	
 	/** main window panels */
+	private JSplitPane MainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JPanel appLeftPanel = new JPanel();
+	private JSplitPane appLeftSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	private JPanel appRightPanel = new JPanel();
 	private JPanel appPatientPanel = new JPanel();
 	private JPanel appActionPanel = new JPanel();
@@ -73,9 +66,11 @@ public class AppView extends JFrame{
 	
 	/** command panel */
 	/* buttons */
-	private JButton appButtonLoadData = new JButton("Download");
+	private JButton appButtonDataLoad = new JButton("Download");
 	private JButton appButtonDataStream = new JButton("Stream data");
 	private JButton appButtonDataSave = new JButton("Save data");
+	private JButton appButtonDataErase = new JButton("Erase data");
+	private JButton appButtonSendTime = new JButton("Time send");
 	
 	/** download panel */
 	/*labels */
@@ -97,9 +92,10 @@ public class AppView extends JFrame{
 		/** set main view */
 		this.setTitle("Holter Viewer v1.0");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(1200,600);
+		this.setMinimumSize(new Dimension(1200, 700)); 
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
+		this.getContentPane().setLayout(new GridBagLayout());
 
 		/** set menu view */
 		appMenuBar.add(appMenu);
@@ -116,16 +112,27 @@ public class AppView extends JFrame{
 		appDownloadDataPanel.setBorder(BorderFactory.createTitledBorder("Download"));
 		appPreviewPanel.setBorder(BorderFactory.createTitledBorder("ECG signal"));
 		
-		//TODO add split!!!
-		GridLayout appPanelsLayout = new GridLayout(1,2);
-		this.setLayout(appPanelsLayout);
-		this.add(appLeftPanel);
-		this.add(appRightPanel);
+		MainPanel.setDividerLocation(400);
+		MainPanel.setEnabled(false);
+	    MainPanel.setLeftComponent(appLeftPanel);  
+	    MainPanel.setRightComponent(appRightPanel); 
+	    GridBagConstraints gridBagConstraints = new GridBagConstraints(); 
+	    gridBagConstraints.fill = GridBagConstraints.BOTH; 
+	    gridBagConstraints.weightx = 1.0; 
+	    gridBagConstraints.weighty = 1.0; 
+	    getContentPane().add(MainPanel, gridBagConstraints);
 		
-		GridLayout appLeftPanelLayout = new GridLayout(2,1);
-		appLeftPanel.setLayout(appLeftPanelLayout);
-		appLeftPanel.add(appPatientPanel);
-		appLeftPanel.add(appActionPanel);
+	    appLeftPanel.setLayout(new GridBagLayout());
+	    
+	    appLeftSplitPane.setDividerLocation(250);
+	    appLeftSplitPane.setEnabled(false);
+	    appLeftSplitPane.setTopComponent(appPatientPanel);  
+	    appLeftSplitPane.setBottomComponent(appActionPanel); 
+	    GridBagConstraints gridBagConstraints2 = new GridBagConstraints(); 
+	    gridBagConstraints2.fill = GridBagConstraints.BOTH; 
+	    gridBagConstraints2.weightx = 1.0; 
+	    gridBagConstraints2.weighty = 1.0;
+	    appLeftPanel.add(appLeftSplitPane, gridBagConstraints2);
 		
 		GridLayout appRightPanelLayout = new GridLayout(1,1);
 		appRightPanel.setLayout(appRightPanelLayout);
@@ -178,14 +185,20 @@ public class AppView extends JFrame{
 		JPanel Crow1 = new JPanel(new FlowLayout());
 		JPanel Crow2 = new JPanel(new FlowLayout());
 		JPanel Crow3 = new JPanel(new FlowLayout());
+		JPanel Crow4 = new JPanel(new FlowLayout());
+		JPanel Crow5 = new JPanel(new FlowLayout());
 		
 		Crow1.add(appButtonDataStream);
 		Crow2.add(appButtonDataSave);
-		Crow3.add(appButtonLoadData);
+		Crow3.add(appButtonDataLoad);
+		Crow4.add(appButtonDataErase);
+		Crow5.add(appButtonSendTime);
 		
 		appCommandPanel.add(Crow1);
 		appCommandPanel.add(Crow2);
 		appCommandPanel.add(Crow3);
+		appCommandPanel.add(Crow4);
+		appCommandPanel.add(Crow5);
 		
 		appActionPanel.add(appActionRowPanel);
 		
@@ -193,21 +206,42 @@ public class AppView extends JFrame{
 		appPatientPanel.setLayout(new BorderLayout());
 		
 		JPanel appPatientDataPanel = new JPanel();
-		appPatientDataPanel.setLayout(new GridLayout(0,2,2,20));
+		appPatientDataPanel.setLayout(new GridBagLayout());
 		
-		appPatientDataPanel.add(appLabelName);
-		appPatientDataPanel.add(appTextFieldName);
-		appPatientDataPanel.add(appLabelSurname);
-		appPatientDataPanel.add(appTextFieldSurname);
-		appPatientDataPanel.add(appLabelID);
-		appPatientDataPanel.add(appTextFieldID);
+		GridBagConstraints d = new GridBagConstraints();
+		d.insets = new Insets(15, 5, 15, 5);
+		d.gridx = 0;
+		d.gridy = 0;
+		d.ipady = 10;
+		appPatientDataPanel.add(appLabelName, d);
+		d.gridx = 1;
+		d.gridy = 0;
+		d.ipady = 10;
+		appPatientDataPanel.add(appTextFieldName, d);
+		d.gridx = 0;
+		d.gridy = 1;
+		d.ipady = 10;
+		appPatientDataPanel.add(appLabelSurname, d);
+		d.gridx = 1;
+		d.gridy = 1;
+		d.ipady = 10;
+		appPatientDataPanel.add(appTextFieldSurname, d);
+		d.gridx = 0;
+		d.gridy = 2;
+		d.ipady = 10;
+		appPatientDataPanel.add(appLabelID, d);
+		d.gridx = 1;
+		d.gridy = 2;
+		d.ipady = 10;
+		appPatientDataPanel.add(appTextFieldID, d);
 		
 		appPatientPanel.add(appPatientDataPanel, BorderLayout.CENTER);
 		
 		JPanel appActionBar1 = new JPanel();
 		appActionBar1.setLayout(new BoxLayout(appActionBar1, BoxLayout.X_AXIS));
-		//TODO add gap
-		appActionBar1.add(appButtonPatientClear);
+		JPanel ABrow = new JPanel(new FlowLayout());
+		ABrow.add(appButtonPatientClear);
+		appActionBar1.add(ABrow);
 		appPatientPanel.add(appActionBar1, BorderLayout.PAGE_END);
 		
 		/** set preview view */
@@ -335,11 +369,11 @@ public class AppView extends JFrame{
 	
 	/** PREVIEW VIEW */
 	public void setDateView(Time date){
-		appLabelPreviewDate.setText(date.getYear_() + "/" + Integer.toHexString(date.getMonth_()) + "/" + Integer.toHexString(date.getDay_()));
+		appLabelPreviewDate.setText(date.getYear_() + "/" + date.getMonth_() + "/" + date.getDay_());
 	}
 	
 	public void setTimeView(Time date){
-		appLabelPreviewTime.setText(Integer.toHexString(date.getHour_()) + "/" + Integer.toHexString(date.getMinute_()) + "/" + Integer.toHexString(date.getSecond_()));
+		appLabelPreviewTime.setText(date.getHour_() + "/" + date.getMinute_() + "/" +date.getSecond_());
 	}
 	
 	public void addSampleToChart(Sample s){
@@ -356,7 +390,9 @@ public class AppView extends JFrame{
 		appButtonClosePort.addActionListener(c);
 		appButtonDataStream.addActionListener(c);
 		appButtonDataSave.addActionListener(c);
-		appButtonLoadData.addActionListener(c);
+		appButtonDataLoad.addActionListener(c);
+		appButtonDataErase.addActionListener(c);
+		appButtonSendTime.addActionListener(c);
 		}
 
 }

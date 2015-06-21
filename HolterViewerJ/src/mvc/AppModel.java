@@ -1,6 +1,6 @@
 package mvc;
 
-import java.util.*;
+import java.time.LocalDateTime;
 
 import data.*;
 import adapters.*;
@@ -16,6 +16,8 @@ public class AppModel {
 	
 	private COMPortAdapter PortCOM;
 	static private int portComBaudrate = 115200;
+	private byte[] comPortCommandFrame = new byte[4];
+	private byte[] comPortTimeFrame = new byte[9];
 	
 	private FileAdapter resultFile;
 	private String csvCellSeparator = ",";
@@ -36,6 +38,8 @@ public class AppModel {
 		appParser = new AppDataParser();
 		dataReadyFlag = 0;
 		downloadDataFlag = false;
+		comPortCommandFrame[0] = (byte)(0xEF);
+		comPortCommandFrame[1] = (byte)(0xFE);
 	}
 	
 	/** setters and getters */
@@ -111,13 +115,33 @@ public class AppModel {
 			dataReadyFlag = 0;
 	}
 	
-	public void sendBytes (String command) {
-		switch(command){
-		case "":
-			System.exit(0);
-			break;
+	public void sendCommands (int code, int value) {	
+		comPortCommandFrame[2] = (byte)(code);
+		comPortCommandFrame[3] = (byte)(value);
+	
+		try{
+			PortCOM.writeBytesToPort(comPortCommandFrame);
+		}catch (SerialPortException e) {
+			e.printStackTrace();
 		}
 			
+	}
+	
+	public void sendTime (){
+		LocalDateTime localTime = LocalDateTime.now();
+		comPortTimeFrame[2] = (byte)(5);
+		comPortTimeFrame[3] = (byte)(localTime.getSecond());
+		comPortTimeFrame[4] = (byte)(localTime.getMinute());
+		comPortTimeFrame[5] = (byte)(localTime.getHour());
+		comPortTimeFrame[6] = (byte)(localTime.getDayOfMonth());
+		comPortTimeFrame[7] = (byte)(localTime.getMonthValue());
+		comPortTimeFrame[8] = (byte)(localTime.getYear());
+		
+		try{
+			PortCOM.writeBytesToPort(comPortTimeFrame);
+		}catch (SerialPortException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void createResultFile (String file_name){

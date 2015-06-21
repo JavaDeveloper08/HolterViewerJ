@@ -1,5 +1,8 @@
 package mvc;
 
+import java.awt.Dimension;
+
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,9 +53,10 @@ public class Utils {
 	
 	static JPanel createLabelTextFieldPanel (JLabel label, JTextField text, int gap) {
 		JPanel p = new JPanel();
+		Dimension gapSize = new Dimension(gap,0);
 		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-		//TODO add gap
 		p.add(label);
+		p.add(Box.createRigidArea(gapSize));
 		p.add(text);
 		return p;
 	}
