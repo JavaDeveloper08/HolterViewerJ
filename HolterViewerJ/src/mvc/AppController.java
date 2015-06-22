@@ -53,27 +53,42 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			
 			case "Stream data":
-				cModel.sendCommands(STREAM_DATA_CMD, 1);
+				if(cView.getAppButtonDataStream().isSelected() == true)
+					cModel.sendCommands(STREAM_DATA_CMD, 1);	
+				else
+					cModel.sendCommands(STREAM_DATA_CMD, 0);
 				break;
+				
 			case "Save data":
-				cModel.sendCommands(SAVE_DATA_CMD, 1);
+				if(cView.getAppButtonDataSave().isSelected() == true)
+					cModel.sendCommands(SAVE_DATA_CMD, 1);
+				else
+					cModel.sendCommands(SAVE_DATA_CMD, 0);
 				break;
+				
 			case "Download":
-				try{
-				cModel.createResultFile(cView.getFileName());
-				cModel.setPatient(cView.readPatientView());
-				cModel.writePatientdDataToFile();
-				} catch (AppException exception){
-					exception.show_exception(); 
+				if(cView.getAppButtonDataLoad().isSelected() == true){
+					try{
+					cModel.createResultFile(cView.getFileName());
+					cModel.setPatient(cView.readPatientView());
+					cModel.writePatientdDataToFile();
+					} catch (AppException exception){
+						exception.show_exception(); 
+					}
+					cModel.setDownloadDataFlag(true);
+					//cModel.sendCommands(DOWNLOAD_DATA_CMD, 1);
 				}
-				cModel.setDownloadDataFlag(true);
-				cModel.sendCommands(DOWNLOAD_DATA_CMD, 1);
+				else {
+					cModel.setDownloadDataFlag(false);
+					cModel.closeFile();
+				}
 				
 				break;
 			case "Erase data":
 				cModel.sendCommands(ERASE_DATA_CMD, 1);
 				break;
 			case "Time send":
+				cModel.sendTime();
 				break;
 		}
 	}

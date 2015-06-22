@@ -66,9 +66,9 @@ public class AppView extends JFrame{
 	
 	/** command panel */
 	/* buttons */
-	private JButton appButtonDataLoad = new JButton("Download");
-	private JButton appButtonDataStream = new JButton("Stream data");
-	private JButton appButtonDataSave = new JButton("Save data");
+	private JToggleButton appButtonDataLoad = new JToggleButton("Download");
+	private JToggleButton appButtonDataStream = new JToggleButton("Stream data");
+	private JToggleButton appButtonDataSave = new JToggleButton("Save data");
 	private JButton appButtonDataErase = new JButton("Erase data");
 	private JButton appButtonSendTime = new JButton("Time send");
 	
@@ -377,9 +377,23 @@ public class AppView extends JFrame{
 	}
 	
 	public void addSampleToChart(Sample s){
-		appECGChart.addPoint(s.getSignal_sample_());
+		appECGChart.addPoint(s.getTimestamp_(),s.getSignal_sample_());
 	}
 	
+	
+	/** getters */
+	public JToggleButton getAppButtonDataLoad() {
+		return appButtonDataLoad;
+	}
+
+	public JToggleButton getAppButtonDataStream() {
+		return appButtonDataStream;
+	}
+
+	public JToggleButton getAppButtonDataSave() {
+		return appButtonDataSave;
+	}
+
 	public void setController(AppController c) {
 		appMenuAbout.addActionListener(c);
 		appMenuClose.addActionListener(c);
@@ -393,6 +407,5 @@ public class AppView extends JFrame{
 		appButtonDataLoad.addActionListener(c);
 		appButtonDataErase.addActionListener(c);
 		appButtonSendTime.addActionListener(c);
-		}
-
+	}
 }

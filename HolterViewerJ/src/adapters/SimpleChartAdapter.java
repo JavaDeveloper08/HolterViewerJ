@@ -133,7 +133,7 @@ public class SimpleChartAdapter extends TimerTask implements MouseListener{
 		for (ITrace2D trace : chart.getTraces()) {
 			trace.removeAllPoints();
 		}
-	}	
+	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {

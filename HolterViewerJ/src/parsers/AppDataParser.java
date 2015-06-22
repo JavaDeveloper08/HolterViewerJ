@@ -85,9 +85,8 @@ public class AppDataParser {
 				header_recevied = true;
 			}
 			else if(b[3] == 0){
-				int sample = ((((int)(b[5])) & 0xFF) << 16) + ((((int)(b[6])) & 0xFF) << 8) + (((int)(b[7])) & 0xFF);
-				double timestamp = ((((int)(b[8])) & 0xFF) << 16) + ((((int)(b[9])) & 0xFF) << 8) + (((int)(b[10])) & 0xFF);
-						//+ (((int)(b[4])) & 0xFF)*0.125;
+				double sample = ((((int)(b[4])) & 0xFF) << 16) + ((((int)(b[5])) & 0xFF) << 8) + (((int)(b[6])) & 0xFF);
+				double timestamp = ((((int)(b[7])) & 0xFF) << 24) + ((((int)(b[8])) & 0xFF) << 16) + ((((int)(b[9])) & 0xFF) << 8) + (((int)(b[10])) & 0xFF);
 	
 				sample_data.setSignal_sample_(sample);
 				sample_data.setTimestamp_(timestamp);

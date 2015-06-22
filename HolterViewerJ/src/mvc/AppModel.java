@@ -17,7 +17,7 @@ public class AppModel {
 	private COMPortAdapter PortCOM;
 	static private int portComBaudrate = 115200;
 	private byte[] comPortCommandFrame = new byte[4];
-	private byte[] comPortTimeFrame = new byte[9];
+	private byte[] comPortTimeFrame = new byte[10];
 	
 	private FileAdapter resultFile;
 	private String csvCellSeparator = ",";
@@ -40,6 +40,8 @@ public class AppModel {
 		downloadDataFlag = false;
 		comPortCommandFrame[0] = (byte)(0xEF);
 		comPortCommandFrame[1] = (byte)(0xFE);
+		comPortTimeFrame[0] = (byte)(0xEF);
+		comPortTimeFrame[1] = (byte)(0xFE);
 	}
 	
 	/** setters and getters */
@@ -135,7 +137,8 @@ public class AppModel {
 		comPortTimeFrame[5] = (byte)(localTime.getHour());
 		comPortTimeFrame[6] = (byte)(localTime.getDayOfMonth());
 		comPortTimeFrame[7] = (byte)(localTime.getMonthValue());
-		comPortTimeFrame[8] = (byte)(localTime.getYear());
+		comPortTimeFrame[8] = (byte)(localTime.getYear() >> 8);
+		comPortTimeFrame[9] = (byte)(localTime.getYear());
 		
 		try{
 			PortCOM.writeBytesToPort(comPortTimeFrame);
@@ -163,6 +166,10 @@ public class AppModel {
 		else if(dataReadyFlag == 2) {
 			resultFile.writeLine(single_sample.toString());
 		}
+	}
+	
+	public void closeFile() {
+		resultFile.close();
 	}
 	
 }
