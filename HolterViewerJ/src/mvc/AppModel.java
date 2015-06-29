@@ -12,7 +12,10 @@ public class AppModel {
 	
 	private Patient patient;
 	private Time exam_time;
+	private Time start_exam_time;
+	private Time stop_exam_time;
 	private Sample single_sample;
+	private Boolean[] device_state = new Boolean[5];
 	
 	private COMPortAdapter PortCOM;
 	static private int portComBaudrate = 115200;
@@ -25,7 +28,8 @@ public class AppModel {
 	
 	private AppDataParser appParser;
 	private int dataReadyFlag;
-	private boolean downloadDataFlag;
+	private int downloadDataFlag;
+	private boolean getStateFlag;
 	
 	/** default constructors */
 	public AppModel (){
@@ -37,7 +41,7 @@ public class AppModel {
 		resultFile = new FileAdapter();
 		appParser = new AppDataParser();
 		dataReadyFlag = 0;
-		downloadDataFlag = false;
+		downloadDataFlag = 0;
 		comPortCommandFrame[0] = (byte)(0xEF);
 		comPortCommandFrame[1] = (byte)(0xFE);
 		comPortTimeFrame[0] = (byte)(0xEF);
@@ -57,6 +61,10 @@ public class AppModel {
 		return dataReadyFlag;
 	}
 	
+	public void setDataReadyFlag(int dataReadyFlag) {
+		this.dataReadyFlag = dataReadyFlag;
+	}
+
 	public Time getExam_time() {
 		return exam_time;
 	}
@@ -65,12 +73,32 @@ public class AppModel {
 		return single_sample;
 	}
 	
-	public boolean getDownloadDataFlag() {
+	public int getDownloadDataFlag() {
 		return downloadDataFlag;
 	}
 
-	public void setDownloadDataFlag(boolean downloadDataFlag) {
+	public void setDownloadDataFlag(int downloadDataFlag) {
 		this.downloadDataFlag = downloadDataFlag;
+	}
+	
+	public void setStart_exam_time(Time start_exam_time) {
+		this.start_exam_time = start_exam_time;
+	}
+
+	public void setStop_exam_time(Time stop_exam_time) {
+		this.stop_exam_time = stop_exam_time;
+	}
+	
+	public Boolean[] getDevice_state() {
+		return device_state;
+	}
+	
+	public boolean isGetStateFlag() {
+		return getStateFlag;
+	}
+
+	public void setGetStateFlag(boolean getStateFlag) {
+		this.getStateFlag = getStateFlag;
 	}
 
 	public void open(String portName){
@@ -113,8 +141,22 @@ public class AppModel {
 			single_sample = appParser.getSample_data();
 			dataReadyFlag = 2;
 		}
-		else
-			dataReadyFlag = 0;
+		else if (appParser.getStart_time_received() == true){
+			appParser.setStart_time_received(false);
+			start_exam_time = appParser.getTime_data();
+		}
+		else if (appParser.getStop_time_received() == true){
+			appParser.setStop_time_received(false);
+			stop_exam_time = appParser.getTime_data();
+		}
+		else if (appParser.getState_received() == true){
+			appParser.setState_received(false);
+			set_state(appParser.getDevice_state());
+			getStateFlag = true;
+		}
+		else if(appParser.getTransfer_end_received() == true){
+			downloadDataFlag = 2;
+		}
 	}
 	
 	public void sendCommands (int code, int value) {	
@@ -170,6 +212,33 @@ public class AppModel {
 	
 	public void closeFile() {
 		resultFile.close();
+	}
+	
+	public void set_state(int state) {
+		if((state & 0x01) != 0)
+			device_state[0] = true;
+		else
+			device_state[0] = false;
+			
+		if((state & 0x02) != 0)
+			device_state[1] = true;
+		else
+			device_state[1] = false;
+		
+		if((state & 0x04) != 0)
+			device_state[2] = true;
+		else
+			device_state[2] = false;
+		
+		if((state & 0x08) != 0)
+			device_state[3] = true;
+		else
+			device_state[3] = false;
+		
+		if((state & 0x10) != 0)
+			device_state[4] = true;
+		else
+			device_state[4] = false;
 	}
 	
 }

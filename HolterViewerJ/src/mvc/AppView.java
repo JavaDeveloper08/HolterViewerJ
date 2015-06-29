@@ -40,6 +40,7 @@ public class AppView extends JFrame{
 	private JPanel appComPortPanel = new JPanel();
 	private JPanel appCommandPanel = new JPanel();
 	private JPanel appDownloadDataPanel = new JPanel();
+	private JPanel appStatePanel = new JPanel();
 	private JPanel appPreviewPanel = new JPanel();
 	
 	/** patient panel components */
@@ -72,6 +73,13 @@ public class AppView extends JFrame{
 	private JButton appButtonDataErase = new JButton("Erase data");
 	private JButton appButtonSendTime = new JButton("Time send");
 	
+	/** state Panel */
+	/* button */
+	private JButton appButtonGetState = new JButton("Get state");
+	private JCheckBox appCheckBoxRun = new JCheckBox("Run",false);
+	private JCheckBox appCheckBoxStream = new JCheckBox("Stream",false);
+	private JCheckBox appCheckBoxSave = new JCheckBox("Save",false);
+	
 	/** download panel */
 	/*labels */
 	private JLabel appLabelFileName = new JLabel("File name:");
@@ -92,7 +100,7 @@ public class AppView extends JFrame{
 		/** set main view */
 		this.setTitle("Holter Viewer v1.0");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setMinimumSize(new Dimension(1200, 700)); 
+		this.setMinimumSize(new Dimension(1200, 720)); 
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
 		this.getContentPane().setLayout(new GridBagLayout());
@@ -108,6 +116,7 @@ public class AppView extends JFrame{
 		appPatientPanel.setBorder(BorderFactory.createTitledBorder("Patient"));
 		appActionPanel.setBorder(BorderFactory.createTitledBorder("Action"));
 		appComPortPanel.setBorder(BorderFactory.createTitledBorder("PortCOM"));
+		appStatePanel.setBorder(BorderFactory.createTitledBorder("Device state"));
 		appCommandPanel.setBorder(BorderFactory.createTitledBorder("Command"));
 		appDownloadDataPanel.setBorder(BorderFactory.createTitledBorder("Download"));
 		appPreviewPanel.setBorder(BorderFactory.createTitledBorder("ECG signal"));
@@ -124,7 +133,7 @@ public class AppView extends JFrame{
 		
 	    appLeftPanel.setLayout(new GridBagLayout());
 	    
-	    appLeftSplitPane.setDividerLocation(250);
+	    appLeftSplitPane.setDividerLocation(240);
 	    appLeftSplitPane.setEnabled(false);
 	    appLeftSplitPane.setTopComponent(appPatientPanel);  
 	    appLeftSplitPane.setBottomComponent(appActionPanel); 
@@ -141,23 +150,48 @@ public class AppView extends JFrame{
 		/** set action view panel */
 		appActionPanel.setLayout(new BorderLayout());
 		
+		JPanel appActionDownPanel = new JPanel(new BorderLayout());
+		
 		/* download view panel  */
 		appDownloadDataPanel.setLayout(new BoxLayout(appDownloadDataPanel, BoxLayout.Y_AXIS));
 		
 		JPanel DOrow1 = new JPanel(new FlowLayout());
 		JPanel DOrow2 = new JPanel(new FlowLayout());
+		JPanel DOrow3 = new JPanel(new FlowLayout());
 		
-		DOrow1.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
-		DOrow2.add(appProgressBar);
+		DOrow1.add(appButtonDataLoad);
+		DOrow2.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
+		DOrow3.add(appProgressBar);
 		
-		appDownloadDataPanel.add(DOrow1);
 		appDownloadDataPanel.add(DOrow2);
-		appActionPanel.add(appDownloadDataPanel, BorderLayout.PAGE_END);
+		appDownloadDataPanel.add(DOrow1);
+		appDownloadDataPanel.add(DOrow3);
 		
-		JPanel appActionRowPanel = new JPanel(new GridLayout(1,2));
+		/* state view panel */
+		appStatePanel.setLayout(new BoxLayout(appStatePanel, BoxLayout.X_AXIS));
+		JPanel Srow1 = new JPanel(new FlowLayout());
+		JPanel Srow2 = new JPanel(new FlowLayout());
+		JPanel Srow3 = new JPanel(new FlowLayout());
 		
-		appActionRowPanel.add(appComPortPanel);
-		appActionRowPanel.add(appCommandPanel);
+		appCheckBoxRun.setEnabled(false);
+		appCheckBoxSave.setEnabled(false);
+		appCheckBoxStream.setEnabled(false);
+		Srow1.add(appCheckBoxRun);
+		Srow2.add(appCheckBoxSave);
+		Srow3.add(appCheckBoxStream);
+		
+		appStatePanel.add(Srow1);
+		appStatePanel.add(Srow2);
+		appStatePanel.add(Srow3);
+		
+		appActionDownPanel.add(appStatePanel, BorderLayout.PAGE_START);
+		appActionDownPanel.add(appDownloadDataPanel);
+		appActionPanel.add(appActionDownPanel, BorderLayout.PAGE_END);
+		
+		JPanel appActionUpPanel = new JPanel(new GridLayout(1,2));
+		
+		appActionUpPanel.add(appComPortPanel);
+		appActionUpPanel.add(appCommandPanel);
 		
 		/* com port view panel */
 		appComPortPanel.setLayout(new BoxLayout(appComPortPanel, BoxLayout.Y_AXIS));
@@ -165,6 +199,7 @@ public class AppView extends JFrame{
 		JPanel CProw1 = new JPanel(new FlowLayout());
 		JPanel CProw2 = new JPanel(new FlowLayout());
 		JPanel CProw3 = new JPanel(new FlowLayout());
+		JPanel CProw4 = new JPanel(new FlowLayout());
 		
 		CProw1.add(appButtonScanPort);
 		CProw1.add(appComboBoxPortName);
@@ -174,11 +209,12 @@ public class AppView extends JFrame{
 		
 		CProw3.add(appButtonOpenPort);
 		appButtonClosePort.setEnabled(false);
-		CProw3.add(appButtonClosePort);
+		CProw4.add(appButtonClosePort);
 		
 		appComPortPanel.add(CProw1);
 		appComPortPanel.add(CProw2);
 		appComPortPanel.add(CProw3);
+		appComPortPanel.add(CProw4);
 		
 		/* command view panel */
 		appCommandPanel.setLayout(new BoxLayout(appCommandPanel, BoxLayout.Y_AXIS));
@@ -190,9 +226,9 @@ public class AppView extends JFrame{
 		
 		Crow1.add(appButtonDataStream);
 		Crow2.add(appButtonDataSave);
-		Crow3.add(appButtonDataLoad);
-		Crow4.add(appButtonDataErase);
-		Crow5.add(appButtonSendTime);
+		Crow3.add(appButtonDataErase);
+		Crow4.add(appButtonSendTime);
+		Crow5.add(appButtonGetState);
 		
 		appCommandPanel.add(Crow1);
 		appCommandPanel.add(Crow2);
@@ -200,7 +236,7 @@ public class AppView extends JFrame{
 		appCommandPanel.add(Crow4);
 		appCommandPanel.add(Crow5);
 		
-		appActionPanel.add(appActionRowPanel);
+		appActionPanel.add(appActionUpPanel);
 		
 		/** set patient view panel */
 		appPatientPanel.setLayout(new BorderLayout());
@@ -367,6 +403,28 @@ public class AppView extends JFrame{
 		appLabelPortOpen.setVisible(false);
 	}
 	
+	public void set_download_state (boolean state){
+		appButtonDataLoad.setSelected(state);
+	}
+	
+	/** STATE VIEW */
+	public void set_run_state (boolean state){
+		appCheckBoxRun.setSelected(state);
+		appCheckBoxRun.setEnabled(state);
+	}
+	
+	public void set_save_state (boolean state){
+		appCheckBoxSave.setSelected(state);
+		appCheckBoxSave.setEnabled(state);
+		appButtonDataSave.setSelected(state);
+	}
+	
+	public void set_stream_state (boolean state){
+		appCheckBoxStream.setSelected(state);
+		appCheckBoxStream.setEnabled(state);
+		appButtonDataStream.setSelected(state);
+	}
+	
 	/** PREVIEW VIEW */
 	public void setDateView(Time date){
 		appLabelPreviewDate.setText(date.getYear_() + "/" + date.getMonth_() + "/" + date.getDay_());
@@ -407,5 +465,6 @@ public class AppView extends JFrame{
 		appButtonDataLoad.addActionListener(c);
 		appButtonDataErase.addActionListener(c);
 		appButtonSendTime.addActionListener(c);
+		appButtonGetState.addActionListener(c);
 	}
 }

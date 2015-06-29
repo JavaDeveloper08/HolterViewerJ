@@ -12,6 +12,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 	private static final int SAVE_DATA_CMD = 2;
 	private static final int DOWNLOAD_DATA_CMD = 3;
 	private static final int ERASE_DATA_CMD = 4;
+	private static final int GET_STATE_CMD = 6;
 	
 	/** parameterized constructors */
 	public AppController (AppModel model, AppView view){
@@ -46,6 +47,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "Open Port":
 				cModel.open(cView.getUserPort());
 				cView.openPortAction();
+				cModel.sendCommands(GET_STATE_CMD, 1);
 				break;
 			case "Close Port":
 				cModel.close();
@@ -70,16 +72,16 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				if(cView.getAppButtonDataLoad().isSelected() == true){
 					try{
 					cModel.createResultFile(cView.getFileName());
-					cModel.setPatient(cView.readPatientView());
-					cModel.writePatientdDataToFile();
+					//cModel.setPatient(cView.readPatientView());
+					//cModel.writePatientdDataToFile();
 					} catch (AppException exception){
 						exception.show_exception(); 
 					}
-					cModel.setDownloadDataFlag(true);
-					//cModel.sendCommands(DOWNLOAD_DATA_CMD, 1);
+					cModel.setDownloadDataFlag(1);
+					cModel.sendCommands(DOWNLOAD_DATA_CMD, 1);
 				}
 				else {
-					cModel.setDownloadDataFlag(false);
+					cModel.setDownloadDataFlag(0);
 					cModel.closeFile();
 				}
 				
@@ -90,6 +92,8 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "Time send":
 				cModel.sendTime();
 				break;
+			case "Get state":
+				cModel.sendCommands(GET_STATE_CMD, 1);
 		}
 	}
 
@@ -98,15 +102,28 @@ public class AppController implements ActionListener, SerialPortEventListener {
 		if (e.isRXCHAR()) {
 			cModel.readBytes();
 			if(cModel.getDataReadyFlag() == 1){
+				cModel.setDataReadyFlag(0);
 				cView.setDateView(cModel.getExam_time());
 				cView.setTimeView(cModel.getExam_time());
 			}
 			else if(cModel.getDataReadyFlag() == 2){
+				cModel.setDataReadyFlag(0);
 				cView.addSampleToChart(cModel.getSingle_sample());
 			}
 			
-			if(cModel.getDownloadDataFlag() == true)
+			if(cModel.getDownloadDataFlag() == 1)
 				cModel.writeDataToFile();
+			else if(cModel.getDownloadDataFlag() == 2){
+				cModel.setDownloadDataFlag(0);
+				cModel.closeFile();
+			}
+			
+			if(cModel.isGetStateFlag() == true){
+				cModel.setGetStateFlag(false);
+				cView.set_stream_state(cModel.getDevice_state()[0]);
+				cView.set_run_state(cModel.getDevice_state()[1]);
+				cView.set_save_state(cModel.getDevice_state()[2]);
+			}
 		}
 		
 	}
