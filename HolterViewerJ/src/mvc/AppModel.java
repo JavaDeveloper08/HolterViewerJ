@@ -14,11 +14,12 @@ public class AppModel {
 	private Time exam_time;
 	private Time start_exam_time;
 	private Time stop_exam_time;
+	private int exam_period;
 	private Sample single_sample;
 	private Boolean[] device_state = new Boolean[5];
 	
 	private COMPortAdapter PortCOM;
-	static private int portComBaudrate = 115200;
+	static private int portComBaudrate = 9600;
 	private byte[] comPortCommandFrame = new byte[4];
 	private byte[] comPortTimeFrame = new byte[10];
 	
@@ -36,6 +37,9 @@ public class AppModel {
 		controller = null;
 		patient = new Patient();
 		exam_time = new Time();
+		start_exam_time = new Time();
+		stop_exam_time = new Time();
+		exam_period = 0;
 		single_sample = new Sample();
 		PortCOM =  new COMPortAdapter();
 		resultFile = new FileAdapter();
@@ -127,30 +131,33 @@ public class AppModel {
 		return PortCOM.isConnected();
 	}
 	
+	public void clear_all_flags (){
+		dataReadyFlag = 0;
+		getStateFlag = false;
+	}
+	
 	public void readBytes () {
 		byte[] comPortFrame;
 		comPortFrame = PortCOM.readBytesFromPort();
 		appParser.parse(comPortFrame);
+		this.clear_all_flags();
+		
 		if(appParser.getHeader_recevied() == true){
-			appParser.setHeader_recevied(false);
 			exam_time = appParser.getTime_data();
 			dataReadyFlag = 1;
 		}
 		else if (appParser.getSample_recevied() == true){
-			appParser.setSample_recevied(false);
 			single_sample = appParser.getSample_data();
 			dataReadyFlag = 2;
 		}
 		else if (appParser.getStart_time_received() == true){
-			appParser.setStart_time_received(false);
 			start_exam_time = appParser.getTime_data();
 		}
 		else if (appParser.getStop_time_received() == true){
-			appParser.setStop_time_received(false);
 			stop_exam_time = appParser.getTime_data();
+			exam_period = Utils.timeDiff(stop_exam_time, start_exam_time);
 		}
 		else if (appParser.getState_received() == true){
-			appParser.setState_received(false);
 			set_state(appParser.getDevice_state());
 			getStateFlag = true;
 		}

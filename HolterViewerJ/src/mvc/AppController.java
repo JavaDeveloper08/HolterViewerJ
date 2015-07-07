@@ -28,14 +28,17 @@ public class AppController implements ActionListener, SerialPortEventListener {
 		
 		switch(actionCommand){
 			case "Close":
-				System.exit(0);
+				if(actionSource == cView.getAppViewerButtonClose())
+					cView.getAppViewerFrame().dispose();
+				else
+					System.exit(0);
 				break;
 			
 			case "About":
 				cView.setAboutFrame();
 				break;
 			case "Viewer":
-				//cView.setViewerFrame();
+				cView.setViewerFrame();
 				break;
 			case "Clear":
 				cView.cleanPatientView();
@@ -94,6 +97,10 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			case "Get state":
 				cModel.sendCommands(GET_STATE_CMD, 1);
+				break;
+			case "Open file":
+				cView.getSelectedPath();
+				break;
 		}
 	}
 
@@ -102,12 +109,10 @@ public class AppController implements ActionListener, SerialPortEventListener {
 		if (e.isRXCHAR()) {
 			cModel.readBytes();
 			if(cModel.getDataReadyFlag() == 1){
-				cModel.setDataReadyFlag(0);
 				cView.setDateView(cModel.getExam_time());
 				cView.setTimeView(cModel.getExam_time());
 			}
 			else if(cModel.getDataReadyFlag() == 2){
-				cModel.setDataReadyFlag(0);
 				cView.addSampleToChart(cModel.getSingle_sample());
 			}
 			
@@ -116,6 +121,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			else if(cModel.getDownloadDataFlag() == 2){
 				cModel.setDownloadDataFlag(0);
 				cModel.closeFile();
+				cView.set_download_state(false);
 			}
 			
 			if(cModel.isGetStateFlag() == true){

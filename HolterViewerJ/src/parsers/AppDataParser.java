@@ -42,10 +42,6 @@ public class AppDataParser {
 	public void setSample_data(Sample sample_data) {
 		this.sample_data = sample_data;
 	}
-	
-	public void setHeader_recevied(Boolean header_recevied) {
-		this.header_recevied = header_recevied;
-	}
 
 	public Boolean getHeader_recevied() {
 		return header_recevied;
@@ -54,33 +50,17 @@ public class AppDataParser {
 	public Boolean getSample_recevied() {
 		return sample_recevied;
 	}
-
-	public void setSample_recevied(Boolean sample_recevied) {
-		this.sample_recevied = sample_recevied;
-	}
 	
 	public Boolean getStart_time_received() {
 		return start_time_received;
 	}
 
-	public void setStart_time_received(Boolean start_time_received) {
-		this.start_time_received = start_time_received;
-	}
-
 	public Boolean getStop_time_received() {
 		return stop_time_received;
-	}
-
-	public void setStop_time_received(Boolean stop_time_received) {
-		this.stop_time_received = stop_time_received;
 	}
 	
 	public Boolean getState_received() {
 		return state_received;
-	}
-
-	public void setState_received(Boolean state_received) {
-		this.state_received = state_received;
 	}
 
 	public int getDevice_state() {
@@ -91,10 +71,16 @@ public class AppDataParser {
 		return transfer_end_received;
 	}
 
-	public void setTransfer_end_received(Boolean transfer_end_received) {
-		this.transfer_end_received = transfer_end_received;
+	public void clear_all_flags() {
+		header_recevied = false;
+		sample_recevied = false;
+		start_time_received = false;
+		stop_time_received = false;
+		device_state = 0;
+		state_received = false;
+		transfer_end_received = false;
 	}
-
+	
 	private boolean is_header(byte b[]){
 		if(b[0] == header_tab[0]){
 			if(b[1] == header_tab[1]){
@@ -120,6 +106,7 @@ public class AppDataParser {
 		if(is_header(b)){
 			Time read_time_data  = new Time();
 			int year;
+			this.clear_all_flags();
 			switch(b[3]){
 				case 0:
 					double sample = ((((int)(b[4])) & 0xFF) << 16) + ((((int)(b[5])) & 0xFF) << 8) + (((int)(b[6])) & 0xFF);
@@ -165,7 +152,6 @@ public class AppDataParser {
 					stop_time_received = true;
 					break;
 				case 4:
-					device_state = 0;
 					device_state |= b[4]; //stream
 					device_state |= b[5] << 1; //run
 					device_state |= b[6] << 2; //save
@@ -176,6 +162,7 @@ public class AppDataParser {
 					
 				case 5:
 					transfer_end_received = true;
+					break;
 			}
 		}
 	}

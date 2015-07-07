@@ -1,12 +1,19 @@
 package mvc;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Calendar;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.text.DateFormatter;
+
+import data.*;
 
 /**
  * @class Utils
@@ -51,7 +58,7 @@ public class Utils {
 		return true;
 	}
 	
-	static JPanel createLabelTextFieldPanel (JLabel label, JTextField text, int gap) {
+	static JPanel createLabelTextFieldPanel (JLabel label, Component text, int gap) {
 		JPanel p = new JPanel();
 		Dimension gapSize = new Dimension(gap,0);
 		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -59,5 +66,32 @@ public class Utils {
 		p.add(Box.createRigidArea(gapSize));
 		p.add(text);
 		return p;
+	}
+	
+	static int timeDiff (Time t1, Time t2){
+		int diff = 0;
+		
+		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60 + (t1.getSecond_() - t2.getSecond_());
+		
+		return diff;
+	}
+	
+	static JSpinner crateTimeSpinner (JSpinner spin){
+		Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+	    SpinnerDateModel model = new SpinnerDateModel();
+	    model.setValue(calendar.getTime());
+	    spin.setModel(model);
+	   
+	    JSpinner.DateEditor editor = new JSpinner.DateEditor(spin, "HH:mm:ss");
+	    DateFormatter formatter = (DateFormatter)editor.getTextField().getFormatter();
+	    formatter.setAllowsInvalid(false);
+	    formatter.setOverwriteMode(true);
+	    spin.setEditor(editor);
+	    
+	    return spin;
 	}
 }
