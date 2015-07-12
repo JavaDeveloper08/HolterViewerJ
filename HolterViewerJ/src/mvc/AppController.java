@@ -7,7 +7,12 @@ import jssc.SerialPortEventListener;
 
 public class AppController implements ActionListener, SerialPortEventListener {
 	private AppModel cModel = null;
-	private AppView cView = null;
+	private static AppView cView = null;
+	
+	public static AppView getcView() {
+		return cView;
+	}
+
 	private static final int STREAM_DATA_CMD = 1;
 	private static final int SAVE_DATA_CMD = 2;
 	private static final int DOWNLOAD_DATA_CMD = 3;
@@ -17,7 +22,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 	/** parameterized constructors */
 	public AppController (AppModel model, AppView view){
 		this.cModel = model;
-		this.cView = view;
+		AppController.cView = view;
 		this.cModel.setController(this);
 	}
 
@@ -113,7 +118,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				cView.setTimeView(cModel.getExam_time());
 			}
 			else if(cModel.getDataReadyFlag() == 2){
-				cView.addSampleToChart(cModel.getSingle_sample());
+				cView.setTimeView(cModel.calculate_current_time());
 			}
 			
 			if(cModel.getDownloadDataFlag() == 1)

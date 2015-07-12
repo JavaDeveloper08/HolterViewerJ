@@ -9,7 +9,7 @@ public class Sample {
 		signal_sample_ = 0;
 		timestamp_ = 0;
 	}
-	public Sample(int signal_sample, int timestamp) {
+	public Sample(double signal_sample, double timestamp) {
 		super();
 		this.signal_sample_ = signal_sample;
 		this.timestamp_ = timestamp;

@@ -5,12 +5,14 @@ import data.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.*;
 
+import parsers.AppDataParser;
 import adapters.SimpleChartAdapter;
 
 public class AppView extends JFrame{
@@ -48,7 +50,7 @@ public class AppView extends JFrame{
 	private JFileChooser appFileChooser = new JFileChooser();
 	public String pathName;
 	/* chart */
-	private int appViewerECGTraceMaxSize = 1000;
+	private int appViewerECGTraceMaxSize = 2500;
 	private SimpleChartAdapter appViewerECGChart = new SimpleChartAdapter(appViewerECGTraceMaxSize); 
 	
 	/** main window panels */
@@ -113,7 +115,7 @@ public class AppView extends JFrame{
 	private JLabel appLabelPreviewDate = new JLabel();
 	private JLabel appLabelPreviewTime = new JLabel();
 	/* chart */
-	private int appECGTraceMaxSize = 500;
+	private int appECGTraceMaxSize = 5000;
 	private SimpleChartAdapter appECGChart = new SimpleChartAdapter(appECGTraceMaxSize); 
 	
 	/** default constructors (all views set) */
@@ -512,7 +514,7 @@ public class AppView extends JFrame{
 	}
 	
 	public void addSampleToChart(Sample s){
-		appECGChart.addPoint(s.getTimestamp_(),s.getSignal_sample_());
+		appECGChart.addPoint(s.getSignal_sample_());
 	}
 	
 	/** getters */

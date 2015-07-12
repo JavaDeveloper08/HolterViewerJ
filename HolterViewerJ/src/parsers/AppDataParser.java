@@ -1,12 +1,15 @@
 package parsers;
 
+import java.util.Vector;
+
 import data.*;
+import mvc.*;
 
 public class AppDataParser {
 	private Time time_data;
-	private Sample sample_data;
+	private Vector<Sample> sample_data;
 	private static final byte[] header_tab = new byte[] {(byte)(0xA5), 0x5A, (byte)(0xFE)};
-	private static final int data_frame_length = 11;
+	private static final int data_samples_number = 30;
 	private Boolean header_recevied;
 	private Boolean sample_recevied;
 	private Boolean start_time_received;
@@ -17,7 +20,7 @@ public class AppDataParser {
 	
 	public AppDataParser(){
 		time_data = new Time();
-		sample_data = new Sample();
+		sample_data = new Vector<Sample>(data_samples_number);
 		header_recevied = false;
 		sample_recevied = false;
 		start_time_received = false;
@@ -35,12 +38,8 @@ public class AppDataParser {
 		this.time_data = time_data;
 	}
 
-	public Sample getSample_data() {
+	public Vector<Sample> getSample_data() {
 		return sample_data;
-	}
-
-	public void setSample_data(Sample sample_data) {
-		this.sample_data = sample_data;
 	}
 
 	public Boolean getHeader_recevied() {
@@ -70,6 +69,10 @@ public class AppDataParser {
 	public Boolean getTransfer_end_received() {
 		return transfer_end_received;
 	}
+	
+	public static int getDataSamplesNumber() {
+		return data_samples_number;
+	}
 
 	public void clear_all_flags() {
 		header_recevied = false;
@@ -97,7 +100,7 @@ public class AppDataParser {
 	}
 	
 	public void parse(byte [] b){
-		if((b == null) || (b.length != data_frame_length)){
+		if((b == null)){
 			header_recevied = false;
 			sample_recevied = false;
 			return;
@@ -109,11 +112,14 @@ public class AppDataParser {
 			this.clear_all_flags();
 			switch(b[3]){
 				case 0:
-					double sample = ((((int)(b[4])) & 0xFF) << 16) + ((((int)(b[5])) & 0xFF) << 8) + (((int)(b[6])) & 0xFF);
-					double timestamp = ((((int)(b[7])) & 0xFF) << 24) + ((((int)(b[8])) & 0xFF) << 16) + ((((int)(b[9])) & 0xFF) << 8) + (((int)(b[10])) & 0xFF);
-		
-					sample_data.setSignal_sample_(sample);
-					sample_data.setTimestamp_(timestamp);
+					double timestamp = b[5]*60 + b[6];
+					sample_data.clear();
+					for(int i=0; i<data_samples_number; i++){
+						double sample = ((((int)(b[i*2+7])) & 0xFF) << 8) + (((int)(b[i*2+8])) & 0xFF);
+						Sample tmp = new Sample(sample, timestamp);
+						sample_data.add(tmp);
+						AppController.getcView().addSampleToChart(tmp);
+					}
 					sample_recevied = true;
 					break;
 				
@@ -155,8 +161,7 @@ public class AppDataParser {
 					device_state |= b[4]; //stream
 					device_state |= b[5] << 1; //run
 					device_state |= b[6] << 2; //save
-					device_state |= b[7] << 3; //transfer
-					device_state |= b[8] << 4; //error
+					device_state |= b[7] << 4; //error
 					state_received = true;
 					break;
 					

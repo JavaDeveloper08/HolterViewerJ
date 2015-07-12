@@ -1,6 +1,7 @@
 package mvc;
 
 import java.time.LocalDateTime;
+import java.util.Vector;
 
 import data.*;
 import adapters.*;
@@ -15,7 +16,7 @@ public class AppModel {
 	private Time start_exam_time;
 	private Time stop_exam_time;
 	private int exam_period;
-	private Sample single_sample;
+	private Vector<Sample> packet_sample;
 	private Boolean[] device_state = new Boolean[5];
 	
 	private COMPortAdapter PortCOM;
@@ -40,7 +41,7 @@ public class AppModel {
 		start_exam_time = new Time();
 		stop_exam_time = new Time();
 		exam_period = 0;
-		single_sample = new Sample();
+		packet_sample = new Vector<Sample>(AppDataParser.getDataSamplesNumber());
 		PortCOM =  new COMPortAdapter();
 		resultFile = new FileAdapter();
 		appParser = new AppDataParser();
@@ -73,10 +74,10 @@ public class AppModel {
 		return exam_time;
 	}
 
-	public Sample getSingle_sample() {
-		return single_sample;
+	public Vector<Sample> getPacket_sample() {
+		return packet_sample;
 	}
-	
+
 	public int getDownloadDataFlag() {
 		return downloadDataFlag;
 	}
@@ -147,7 +148,7 @@ public class AppModel {
 			dataReadyFlag = 1;
 		}
 		else if (appParser.getSample_recevied() == true){
-			single_sample = appParser.getSample_data();
+			packet_sample = appParser.getSample_data();
 			dataReadyFlag = 2;
 		}
 		else if (appParser.getStart_time_received() == true){
@@ -196,6 +197,15 @@ public class AppModel {
 		}
 	}
 	
+	public Time calculate_current_time(){
+		Double min = packet_sample.get(0).getTimestamp_()%60;
+		Double hour = packet_sample.get(0).getTimestamp_()/60;
+		exam_time.setMinute_(min.intValue());
+		exam_time.setHour_(hour.intValue());
+		
+		return exam_time;
+	}
+	
 	public void createResultFile (String file_name){
 		String dataDirPath = System.getProperty("user.dir") + "/" + "data" + "/";
 		FileAdapter.createDirectory(dataDirPath);
@@ -213,7 +223,8 @@ public class AppModel {
 			resultFile.writeLine(exam_time.toString());
 		}
 		else if(dataReadyFlag == 2) {
-			resultFile.writeLine(single_sample.toString());
+			for(Sample i:packet_sample)
+				resultFile.writeLine(i.toString());
 		}
 	}
 	
