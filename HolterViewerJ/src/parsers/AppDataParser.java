@@ -115,7 +115,7 @@ public class AppDataParser {
 					double timestamp = b[5]*60 + b[6];
 					sample_data.clear();
 					for(int i=0; i<data_samples_number; i++){
-						double sample = ((((int)(b[i*2+7])) & 0xFF) << 8) + (((int)(b[i*2+8])) & 0xFF);
+						double sample = (int)(b[i*2+7] << 8) + ((b[i*2+8]) & 0xFF);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
 						AppController.getcView().addSampleToChart(tmp);
