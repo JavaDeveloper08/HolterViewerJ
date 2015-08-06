@@ -76,6 +76,14 @@ public class Utils {
 		return diff;
 	}
 	
+	static int timeDiffWithoutSec (Time t1, Time t2){
+		int diff = 0;
+		
+		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60;
+		
+		return diff;
+	}
+	
 	static JSpinner crateTimeSpinner (JSpinner spin){
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
@@ -93,5 +101,26 @@ public class Utils {
 	    spin.setEditor(editor);
 	    
 	    return spin;
+	}
+	
+	private static final long referance_value = 2420;
+	private static final long scope_value = 0x7FFF;
+	public static double calculateSignalData (double sample) {
+		double csample = 0;
+		
+		if(sample > 0){
+			if (sample == scope_value)
+				csample = referance_value;
+			else
+				csample = (referance_value * sample) / scope_value;
+		}
+		else {
+			if (sample == -scope_value)
+				csample = -referance_value;
+			else
+				csample = (referance_value * sample) / scope_value;
+		}
+		
+		return csample;
 	}
 }

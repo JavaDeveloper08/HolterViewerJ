@@ -10,7 +10,6 @@ public class AppDataParser {
 	private Vector<Sample> sample_data;
 	private static final byte[] header_tab = new byte[] {(byte)(0xA5), 0x5A, (byte)(0xFE)};
 	private static final int data_samples_number = 30;
-	private Boolean header_recevied;
 	private Boolean sample_recevied;
 	private Boolean start_time_received;
 	private Boolean stop_time_received;
@@ -21,7 +20,6 @@ public class AppDataParser {
 	public AppDataParser(){
 		time_data = new Time();
 		sample_data = new Vector<Sample>(data_samples_number);
-		header_recevied = false;
 		sample_recevied = false;
 		start_time_received = false;
 		stop_time_received = false;
@@ -40,10 +38,6 @@ public class AppDataParser {
 
 	public Vector<Sample> getSample_data() {
 		return sample_data;
-	}
-
-	public Boolean getHeader_recevied() {
-		return header_recevied;
 	}
 
 	public Boolean getSample_recevied() {
@@ -75,7 +69,6 @@ public class AppDataParser {
 	}
 
 	public void clear_all_flags() {
-		header_recevied = false;
 		sample_recevied = false;
 		start_time_received = false;
 		stop_time_received = false;
@@ -101,8 +94,7 @@ public class AppDataParser {
 	
 	public void parse(byte [] b){
 		if((b == null)){
-			header_recevied = false;
-			sample_recevied = false;
+			this.clear_all_flags();
 			return;
 		}
 			
@@ -116,6 +108,7 @@ public class AppDataParser {
 					sample_data.clear();
 					for(int i=0; i<data_samples_number; i++){
 						double sample = (int)(b[i*2+7] << 8) + ((b[i*2+8]) & 0xFF);
+						sample = Utils.calculateSignalData(sample);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
 						AppController.getcView().addSampleToChart(tmp);
@@ -124,15 +117,21 @@ public class AppDataParser {
 					break;
 				
 				case 1:
-					read_time_data.setDay_(b[4]);
-					read_time_data.setMonth_(b[5]);
-					year = (((int)(b[6] & 0xFF)) << 8) | ((int)(b[7])) & 0xFF;
+					device_state |= b[4]; //stream
+					device_state |= b[5] << 1; //run
+					device_state |= b[6] << 2; //save
+					device_state |= b[7] << 4; //error
+					
+					read_time_data.setDay_(b[8]);
+					read_time_data.setMonth_(b[9]);
+					year = (((int)(b[10] & 0xFF)) << 8) | ((int)(b[11])) & 0xFF;
 					read_time_data.setYear_(year);
-					read_time_data.setHour_((int)(b[8] & 0xFF));
-					read_time_data.setMinute_((int)(b[9] & 0xFF));
-					read_time_data.setSecond_((int)(b[10] & 0xFF));
+					read_time_data.setHour_((int)(b[12] & 0xFF));
+					read_time_data.setMinute_((int)(b[13] & 0xFF));
+					read_time_data.setSecond_((int)(b[14] & 0xFF));
 					time_data = read_time_data;
-					header_recevied = true;
+					
+					state_received = true;
 					break;
 					
 				case 2:
@@ -146,6 +145,7 @@ public class AppDataParser {
 					time_data = read_time_data;
 					start_time_received = true;
 					break;
+				
 				case 3:
 					read_time_data.setDay_(b[4]);
 					read_time_data.setMonth_(b[5]);
@@ -157,15 +157,8 @@ public class AppDataParser {
 					time_data = read_time_data;
 					stop_time_received = true;
 					break;
-				case 4:
-					device_state |= b[4]; //stream
-					device_state |= b[5] << 1; //run
-					device_state |= b[6] << 2; //save
-					device_state |= b[7] << 4; //error
-					state_received = true;
-					break;
 					
-				case 5:
+				case 4:
 					transfer_end_received = true;
 					break;
 			}

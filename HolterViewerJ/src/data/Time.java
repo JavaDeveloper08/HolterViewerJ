@@ -113,9 +113,13 @@ public class Time {
 			return false;
 		return true;
 	}
+	
+	public String getTime (){
+		return year_ + "/" + month_ + "/" + "/" + day_ + " " + hour_ + ":" + minute_ + ":" + second_;
+	}
 
 	@Override
 	public String toString() {
-		return year_ + "-" + month_ + "-" + day_ + "T" + hour_ + ":" + minute_ + ":" + second_ + ":" + msecond_;
+		return year_ + "," + month_ + "," + day_ + "," + hour_ + "," + minute_;
 	}
 }

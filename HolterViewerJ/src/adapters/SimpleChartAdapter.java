@@ -1,11 +1,14 @@
 package adapters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisTitlePainter;
 import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -22,8 +25,8 @@ public class SimpleChartAdapter extends TimerTask implements MouseListener{
 
     	chart = new Chart2D();
     	this.maxPoints = maxPoints;
-        chart.setBackground(Color.BLACK);
-    	chart.setGridColor(Color.DARK_GRAY);
+        chart.setBackground(Color.LIGHT_GRAY);
+    	chart.setGridColor(Color.BLACK);
         chart.addMouseListener(this);
         setXLabel("");
         setYLabel("");
@@ -101,7 +104,7 @@ public class SimpleChartAdapter extends TimerTask implements MouseListener{
 		ITrace2D trace;
 		trace = chart.getTraces().iterator().next();
 		int index = (int)Math.round(trace.getMaxX());
-		trace.addPoint(++index, y);
+		trace.addPoint(index+2, y);
 	}
 	/**
 	 * Adding point to specific trace

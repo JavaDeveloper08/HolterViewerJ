@@ -4,8 +4,6 @@ import data.*;
 
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -33,25 +31,6 @@ public class AppView extends JFrame{
 	private JTextPane appAboutTextPane = new JTextPane(appAboutStyleDoc);
 	//TODO dokoñczyæ about
 	public static final String appAboutText = "HolterViewer\n";
-	
-	/** viewer frame */
-	private JFrame appViewerFrame = new JFrame("Viewer");
-	/* buttons */
-	private JButton appViewerButtonOpenFile = new JButton("Open file");
-	private	JButton appViewerButtonShow = new JButton("Show");
-	private	JButton appViewerButtonClose = new JButton("Close");
-	/* labels */
-	private JLabel appViewerLabelFrom = new JLabel("From:");
-	private JLabel appViewerLabelTo = new JLabel("To:");
-	/* spinners */
-	private JSpinner appViewerSpinnerFrom = new JSpinner();
-	private JSpinner appViewerSpinnerTo = new JSpinner();
-	/* file chooser */
-	private JFileChooser appFileChooser = new JFileChooser();
-	public String pathName;
-	/* chart */
-	private int appViewerECGTraceMaxSize = 2500;
-	private SimpleChartAdapter appViewerECGChart = new SimpleChartAdapter(appViewerECGTraceMaxSize); 
 	
 	/** main window panels */
 	private JSplitPane MainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -184,6 +163,10 @@ public class AppView extends JFrame{
 		
 		DOrow1.add(appButtonDataLoad);
 		DOrow2.add(Utils.createLabelTextFieldPanel(appLabelFileName, appTextFileName, 30));
+		appProgressBar.setMinimum(0);
+		appProgressBar.setMaximum(100);
+		appProgressBar.setValue(appProgressBar.getMinimum());
+		appProgressBar.setStringPainted(true);
 		DOrow3.add(appProgressBar);
 		
 		appDownloadDataPanel.add(DOrow2);
@@ -316,10 +299,10 @@ public class AppView extends JFrame{
 		appPreviewPanel.add(appExaminationDatePanel, BorderLayout.PAGE_END);
 		
 		appECGChart.setXLabel("Time[ms]");
-		appECGChart.setYLabel("Signal[V]");
+		appECGChart.setYLabel("Signal[mV]");
 		appECGChart.setGrid(true);
 		
-		appECGChart.createNewTraceLtd(Color.RED, "ECG Signal");
+		appECGChart.createNewTraceLtd(Color.BLUE, "ECG Signal");
 
 		appPreviewPanel.add(appECGChart.getChartPanel(), BorderLayout.CENTER);
 	}
@@ -349,62 +332,6 @@ public class AppView extends JFrame{
 		appAboutFrame.setVisible(true);
 		
 		return appAboutFrame;
-	}
-	
-	/** VIEWER FRAME*/
-	public void setViewerFrame() {
-		appViewerFrame.setSize(1100,620);
-		appViewerFrame.setResizable(true);
-		appViewerFrame.setLocationRelativeTo(null);
-		appViewerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		appViewerFrame.setVisible(true);
-		
-		appViewerFrame.setLayout(new BorderLayout());
-		appViewerFrame.add(appViewerECGChart.getChartPanel(), BorderLayout.CENTER);
-		
-		JPanel appViewerActionBar = new JPanel();
-		appViewerActionBar.setLayout(new BoxLayout(appViewerActionBar, BoxLayout.X_AXIS));
-		
-		JPanel Vcolumn1 = new JPanel(new FlowLayout());
-		JPanel Vcolumn2 = new JPanel(new FlowLayout());
-		JPanel Vcolumn3 = new JPanel(new FlowLayout());
-		JPanel Vcolumn4 = new JPanel(new FlowLayout());
-		JPanel Vcolumn5 = new JPanel(new FlowLayout());
-		
-		appViewerSpinnerFrom = Utils.crateTimeSpinner(appViewerSpinnerFrom);
-		appViewerSpinnerTo = Utils.crateTimeSpinner(appViewerSpinnerTo);
-		
-		Vcolumn1.add(appViewerButtonOpenFile);
-		Vcolumn2.add(Utils.createLabelTextFieldPanel(appViewerLabelFrom, appViewerSpinnerFrom, 10));
-		Vcolumn3.add(Utils.createLabelTextFieldPanel(appViewerLabelTo, appViewerSpinnerTo, 10));
-		Vcolumn4.add(appViewerButtonShow);
-		Vcolumn5.add(appViewerButtonClose);
-
-		appViewerActionBar.add(Vcolumn1);
-		appViewerActionBar.add(Vcolumn2);
-		appViewerActionBar.add(Vcolumn3);
-		appViewerActionBar.add(Vcolumn4);
-		appViewerActionBar.add(Vcolumn5);
-		
-		appViewerFrame.add(appViewerActionBar, BorderLayout.PAGE_END);
-	}
-	
-	/**
-	 * @fn getSelectedPath()
-	 * @brief get selected file path
-	 * @return file path
-	 */
-	public String getSelectedPath() {
-		appFileChooser.setFileFilter(new FileNameExtensionFilter("CSV files", "csv"));
-		appFileChooser.setDialogTitle("Choose a file");
-		int returnValue = appFileChooser.showOpenDialog(null);
-		if (returnValue == JFileChooser.APPROVE_OPTION)
-		{
-			 pathName = appFileChooser.getSelectedFile().getPath();
-		}
-			 	
-		return pathName;
 	}
 	
 	/** PATIENT VIEW */
@@ -460,12 +387,6 @@ public class AppView extends JFrame{
 		}
 	}
 	
-	public String getFileName() throws AppException {
-		if(appTextFileName.getText().isEmpty())
-			throw new AppException("Podaj nazwê docelowego pliku");
-		return appTextFileName.getText();
-	}
-	
 	public String getUserPort() {
 		return (String) appComboBoxPortName.getSelectedItem();
 	}
@@ -480,10 +401,6 @@ public class AppView extends JFrame{
 		appButtonOpenPort.setEnabled(true);
 		appButtonClosePort.setEnabled(false);
 		appLabelPortOpen.setVisible(false);
-	}
-	
-	public void set_download_state (boolean state){
-		appButtonDataLoad.setSelected(state);
 	}
 	
 	/** STATE VIEW */
@@ -502,6 +419,26 @@ public class AppView extends JFrame{
 		appCheckBoxStream.setSelected(state);
 		appCheckBoxStream.setEnabled(state);
 		appButtonDataStream.setSelected(state);
+	}
+	
+	/** DOWNLOAD VIEW */
+	public void set_download_state (boolean state){
+		appButtonDataLoad.setSelected(state);
+	}
+	
+	public String getFileName() throws AppException {
+		if(appTextFileName.getText().isEmpty())
+			throw new AppException("Podaj nazwê docelowego pliku");
+		return appTextFileName.getText();
+	}
+	
+	public void setProgressBarValue (int value) {
+		if (value > 100)
+			appProgressBar.setValue(100);
+		else if (value < 0)
+			appProgressBar.setValue(100);
+		else
+			appProgressBar.setValue(value);
 	}
 	
 	/** PREVIEW VIEW */
@@ -529,14 +466,6 @@ public class AppView extends JFrame{
 	public JToggleButton getAppButtonDataSave() {
 		return appButtonDataSave;
 	}
-	
-	public JFrame getAppViewerFrame() {
-		return appViewerFrame;
-	}
-
-	public JButton getAppViewerButtonClose() {
-		return appViewerButtonClose;
-	}
 
 	public void setController(AppController c) {
 		appMenuAbout.addActionListener(c);
@@ -552,10 +481,5 @@ public class AppView extends JFrame{
 		appButtonDataErase.addActionListener(c);
 		appButtonSendTime.addActionListener(c);
 		appButtonGetState.addActionListener(c);
-		
-		//Viewer
-		appViewerButtonOpenFile.addActionListener(c);
-		appViewerButtonShow.addActionListener(c);
-		appViewerButtonClose.addActionListener(c);
 	}
 }
