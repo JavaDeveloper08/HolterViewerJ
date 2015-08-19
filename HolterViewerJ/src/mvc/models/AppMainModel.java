@@ -1,14 +1,15 @@
-package mvc;
+package mvc.models;
 
 import java.time.LocalDateTime;
 import java.util.Vector;
 
+import mvc.AppController;
 import data.*;
 import adapters.*;
 import parsers.*;
 import jssc.SerialPortException;
 
-public class AppModel {
+public class AppMainModel {
 	private AppController controller;
 	
 	private Patient patient;
@@ -29,24 +30,24 @@ public class AppModel {
 	private String csvCellSeparator = ",";
 	private String csvLineSeparator = System.lineSeparator();
 	
-	private AppDataParser appParser;
+	private SerialPortDataParser appParser;
 	private int dataReadyFlag;
 	private int downloadDataFlag;
 	private boolean getStateFlag;
 	
 	/** default constructors */
-	public AppModel (){
+	public AppMainModel (){
 		controller = null;
 		patient = new Patient();
 		exam_time = new Time();
 		start_exam_time = new Time();
 		stop_exam_time = new Time();
-		packet_sample = new Vector<Sample>(AppDataParser.getDataSamplesNumber());
+		packet_sample = new Vector<Sample>(SerialPortDataParser.getDataSamplesNumber());
 		samples_counter = 0;
 		precentOfData = 0;
 		PortCOM =  new SerialPortAdapter();
 		resultFile = new FileAdapter();
-		appParser = new AppDataParser();
+		appParser = new SerialPortDataParser();
 		dataReadyFlag = 0;
 		downloadDataFlag = 0;
 		comPortCommandFrame[0] = (byte)(0xEF);

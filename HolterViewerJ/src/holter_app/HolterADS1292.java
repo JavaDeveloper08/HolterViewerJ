@@ -1,64 +1,64 @@
 package holter_app;
 
 import java.awt.EventQueue;
+
 import mvc.*;
+import mvc.models.AppMainModel;
+import mvc.views.AppMainView;
 
 /**
- * Project is divided to common and user packages. 
- * The common packages contain common and abstract classes which are used in different applications.
+ * @name HolterADS1292
+ * @author Artur Tynecki
+ * @brief simple application to control HolterADS1292 device, download and view results
+ * @version 1.0
  * 
- * Class types in common packages:
+ * @section DESCRIPTION
+ * It is simple application for control HolterADS1292 by serial port. 
+ * Application allows:
+ * 	1. live stream date from device
+ * 	2. save backup on device
+ * 	3. erase all data form backup on device
+ * 	4. send current time to device
+ * 	5. get and display device state
+ * 	6. download backup form device and write to CSV file with patient data
+ * 	7. viewing data from CSV file by Viewer application
+ * 
+ * Graphical User Interface based on MCV (Model-View-Controller) pattern.
+ * 
+ * Project is divided to packages: 
+ * 
  * [Adapters]
- * 		Adapters, are to lowest level classes which provide I/O methods used by Communicators.
- * 
- * [Communicator]
- * 		Raw data collected in Adapters, are passed to Communicators (Communicators, implement AdapterListenerInterface).
- * 		Moreover this class creates and manages data parsers.
- * 		In common package are two types of Communicators: AbstractCommunicator and FileStramCommunicator.
- * 		The first one is abstract class which user must extend and implement some abstract method.
- * 		The second one is implemented AbstractCommunicator class which provide load file as a i.e COMM port stream.
- * 
- * [FileAdapters]
- * 		Providing I/O operations to files.
- * 		FastFileAdapter using faster MappedByteBuffers and is recommended with binary files.
- * 		SimpleFileAdapter is using standard File Streams, and is recommended with text files.
+ * 		Adapters contain classes which provide I/O methods for serial port, file and chart module.
  * 
  * [Parsers]
  * 		Parsers are use to putting raw data to correct objects.
- * 		AbstractParser implements whole parsing mechanism, so users job is to define frame patterns, 
- * 		and implement method which handling parsed data.
- * 		At the end of packing data to objects user must call sendDataToListeners() passing AbstractParserData object.
- * 		Each parser works in separate thread.
+ * 		Contain parser to serial port data and file data.
  * 
- * [Processing]
- * 		Some classes which share useful data processing functions.
+ * [Data]
+ * 		Data contain classes which are representation of specified object (patient, sample, time).
  * 
- * [Views]
- * 		This is GUI Layer divided to generic views which are common in all applications.
+ * [MVC]
+ * 		This packages contains classes which are components of MVC pattern (models, views, controller, exception).
+ * 		Utils class contains auxiliary methods of project.
  * 
- * [Link]
- *  	Classes of this type are separated layer, called link layer. It is intended to link others layer together.
- *  	User, extends AbstractLink class give the form of his application.
- *  
+ * [Holter_app]
+ *  	Contains main of project.
  *  
  * Remember that you must attached all libraries from lib directory.
  *
  */
 
 public class HolterADS1292 {
-
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-            	AppModel model = new AppModel();
-				AppView view = new AppView();
+            	AppMainModel model = new AppMainModel();
+				AppMainView view = new AppMainView();
 				AppController controller = new AppController(model, view);
 				view.setController(controller);
 				view.setVisible(true);
             }
         });
-
 	}
-
 }

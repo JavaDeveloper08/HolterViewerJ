@@ -1,5 +1,9 @@
 package data;
 
+/**
+ * @class Time
+ * @brief class representing time object contains: year, month, day, hour, minute, second, milisecond
+ */
 public class Time {
 	private int msecond_;
 	private int second_;
@@ -9,7 +13,6 @@ public class Time {
 	private int month_;
 	private int year_;
 	
-	/** default constructors */
 	public Time(){
 		msecond_ = 0;
 		second_ = 0;
@@ -19,8 +22,7 @@ public class Time {
 		month_ = 1;
 		year_ = 1970;
 	}
-	
-	/** parameterized constructors */
+
 	public Time(int ms, int s, int min, int h, int d, int m, int y){
 		msecond_ = ms;
 		second_ = s;
@@ -31,7 +33,9 @@ public class Time {
 		year_ = y;
 	}
 
-	/** getters and setters */
+	/**
+	 * Getters and setters to class fields
+	 */
 	public int getMsecond_() {
 		return msecond_;
 	}
@@ -88,6 +92,12 @@ public class Time {
 		this.year_ = year_;
 	}
 
+	/**
+	 * @methods equals()
+	 * @brief method for compare time
+	 * @param general object
+	 * @return true if equal
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -114,10 +124,38 @@ public class Time {
 		return true;
 	}
 	
-	public String getTime (){
+	/**
+	 * @methods getTime()
+	 * @brief getting time(hour, minute, second) in string representation 
+	 * @return time in string
+	 */
+	public String getTime() {
+		return hour_ + ":" + minute_ + ":" + second_;
+	}
+	
+	/**
+	 * @methods getDate()
+	 * @brief getting date(year, month, day) in string representation 
+	 * @return date in string
+	 */
+	public String getDate() {
+		return year_ + "/" + month_ + "/" + "/" + day_;
+	}
+	
+	/**
+	 * @methods getFullTime()
+	 * @brief getting full time object(year, month, day, hours, minutes, seconds) in string representation 
+	 * @return full time in string
+	 */
+	public String getFullTime() {
 		return year_ + "/" + month_ + "/" + "/" + day_ + " " + hour_ + ":" + minute_ + ":" + second_;
 	}
 
+	/**
+	 * @methods toString()
+	 * @brief method return object representation in string
+	 * @return string representation of object
+	 */
 	@Override
 	public String toString() {
 		return year_ + "," + month_ + "," + day_ + "," + hour_ + "," + minute_;

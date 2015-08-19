@@ -2,15 +2,18 @@ package mvc;
 
 import java.awt.event.*;
 
+import mvc.models.AppMainModel;
+import mvc.views.AppMainView;
+import mvc.views.AppViewerView;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 
 public class AppController implements ActionListener, SerialPortEventListener {
-	private AppModel cModel = null;
-	private static AppView cView = null;
-	private static AppViewer cViewer = null;
+	private AppMainModel cModel = null;
+	private static AppMainView cView = null;
+	private static AppViewerView cViewer = null;
 	
-	public static AppView getcView() {
+	public static AppMainView getcView() {
 		return cView;
 	}
 
@@ -23,10 +26,10 @@ public class AppController implements ActionListener, SerialPortEventListener {
 	private int progressBarValue;
 	
 	/** parameterized constructors */
-	public AppController (AppModel model, AppView view){
+	public AppController (AppMainModel model, AppMainView view){
 		this.cModel = model;
 		this.cView = view;
-		this.cViewer = new AppViewer();
+		this.cViewer = new AppViewerView();
 		cViewer.setController(this);
 		this.cModel.setController(this);
 		progressBarValue = 0;

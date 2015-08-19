@@ -28,7 +28,7 @@ public class Utils {
 	 * @param string line
 	 * @return true if line contain text
 	 */
-	static boolean isText (String line){
+	public static boolean isText (String line){
 		if(line.isEmpty())
 			return false;
 		for(int i=0; i<line.length(); i++){
@@ -48,7 +48,7 @@ public class Utils {
 	 * @param string line
 	 * @return true if line contain number
 	 */
-	static boolean isNumber (String line){
+	public static boolean isNumber (String line){
 		if(line.isEmpty())
 			return false;
 		for(int i=0; i<line.length(); i++){
@@ -58,7 +58,7 @@ public class Utils {
 		return true;
 	}
 	
-	static JPanel createLabelTextFieldPanel (JLabel label, Component text, int gap) {
+	public static JPanel createLabelTextFieldPanel (JLabel label, Component text, int gap) {
 		JPanel p = new JPanel();
 		Dimension gapSize = new Dimension(gap,0);
 		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -68,7 +68,7 @@ public class Utils {
 		return p;
 	}
 	
-	static int timeDiff (Time t1, Time t2){
+	public static int timeDiff (Time t1, Time t2){
 		int diff = 0;
 		
 		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60 + (t1.getSecond_() - t2.getSecond_());
@@ -76,7 +76,7 @@ public class Utils {
 		return diff;
 	}
 	
-	static int timeDiffWithoutSec (Time t1, Time t2){
+	public static int timeDiffWithoutSec (Time t1, Time t2){
 		int diff = 0;
 		
 		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60;
@@ -84,7 +84,7 @@ public class Utils {
 		return diff;
 	}
 	
-	static JSpinner crateTimeSpinner (JSpinner spin){
+	public static JSpinner crateTimeSpinner (JSpinner spin){
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
         calendar.set(Calendar.MINUTE, 0);

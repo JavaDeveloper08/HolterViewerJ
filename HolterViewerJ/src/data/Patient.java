@@ -1,5 +1,9 @@
 package data;
 
+/**
+ * @class Patient
+ * @brief class representing patient object contains personal information (name, surname, ID number)
+ */
 public class Patient {
 	private String name_;
 	private String last_name_;
@@ -17,6 +21,9 @@ public class Patient {
 		ID_num_ = ID_num;
 	}
 	
+	/**
+	 * Getters and setters to class fields
+	 */
 	public String getName_() {
 		return name_;
 	}
@@ -37,6 +44,12 @@ public class Patient {
 		ID_num_ = iD_num_;
 	}
 	
+	/**
+	 * @methods equals()
+	 * @brief method for compare patient object by ID number
+	 * @param general object
+	 * @return true if equal
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -54,9 +67,13 @@ public class Patient {
 		return true;
 	}
 
+	/**
+	 * @methods toString()
+	 * @brief method return object representation in string
+	 * @return string representation of object
+	 */
 	@Override
 	public String toString() {
 		return name_ + "," + last_name_ + "," + ID_num_;
 	}
-	
 }

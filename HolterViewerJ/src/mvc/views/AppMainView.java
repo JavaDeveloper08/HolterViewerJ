@@ -1,4 +1,4 @@
-package mvc;
+package mvc.views;
 
 import data.*;
 
@@ -10,10 +10,13 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.*;
 
-import parsers.AppDataParser;
+import mvc.AppController;
+import mvc.AppException;
+import mvc.Utils;
+import parsers.SerialPortDataParser;
 import adapters.Chart2DAdapter;
 
-public class AppView extends JFrame{
+public class AppMainView extends JFrame{
 
 	private static final long serialVersionUID = 1L;
 
@@ -98,7 +101,7 @@ public class AppView extends JFrame{
 	private Chart2DAdapter appECGChart = new Chart2DAdapter(appECGTraceMaxSize); 
 	
 	/** default constructors (all views set) */
-	public AppView(){
+	public AppMainView(){
 		/** set main view */
 		this.setTitle("Holter ADS1292 v1.0");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

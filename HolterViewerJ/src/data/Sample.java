@@ -1,20 +1,26 @@
 package data;
 
+/**
+ * @class Sample
+ * @brief class representing signal sample object contains signal value and timestamp value
+ */
 public class Sample {
 	private double signal_sample_;
 	private double timestamp_;
 	
 	public Sample(){
-		super();
 		signal_sample_ = 0;
 		timestamp_ = 0;
 	}
+	
 	public Sample(double signal_sample, double timestamp) {
-		super();
 		this.signal_sample_ = signal_sample;
 		this.timestamp_ = timestamp;
 	}
 	
+	/**
+	 * Getters and setters to class fields
+	 */
 	public double getSignal_sample_() {
 		return signal_sample_;
 	}
@@ -31,6 +37,12 @@ public class Sample {
 		this.timestamp_ = timestamp_;
 	}
 
+	/**
+	 * @methods equals()
+	 * @brief method for compare sample
+	 * @param general object
+	 * @return true if equal
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -47,6 +59,11 @@ public class Sample {
 		return true;
 	}
 	
+	/**
+	 * @methods toString()
+	 * @brief method return object representation in string
+	 * @return string representation of object
+	 */
 	@Override
 	public String toString() {
 		return Double.toString(timestamp_) + "," + Double.toString(signal_sample_);

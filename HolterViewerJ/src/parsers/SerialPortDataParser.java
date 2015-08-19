@@ -5,7 +5,11 @@ import java.util.Vector;
 import data.*;
 import mvc.*;
 
-public class AppDataParser {
+/**
+ * @class SerialPortDataParser
+ * @brief parser to data from serial port
+ */
+public class SerialPortDataParser {
 	private Time time_data;
 	private Vector<Sample> sample_data;
 	private static final byte[] header_tab = new byte[] {(byte)(0xA5), 0x5A, (byte)(0xFE)};
@@ -17,7 +21,7 @@ public class AppDataParser {
 	private Boolean state_received;
 	private Boolean transfer_end_received;
 	
-	public AppDataParser(){
+	public SerialPortDataParser(){
 		time_data = new Time();
 		sample_data = new Vector<Sample>(data_samples_number);
 		sample_recevied = false;
@@ -28,12 +32,11 @@ public class AppDataParser {
 		transfer_end_received = false;
 	}
 
+	/**
+	 * Getters to class fields
+	 */
 	public Time getTime_data() {
 		return time_data;
-	}
-
-	public void setTime_data(Time time_data) {
-		this.time_data = time_data;
 	}
 
 	public Vector<Sample> getSample_data() {
@@ -68,7 +71,11 @@ public class AppDataParser {
 		return data_samples_number;
 	}
 
-	public void clear_all_flags() {
+	/**
+	 * @methods clear_all_flags()
+	 * @brief clear all flags in parser
+	 */
+	private void clear_all_flags() {
 		sample_recevied = false;
 		start_time_received = false;
 		stop_time_received = false;
@@ -77,6 +84,12 @@ public class AppDataParser {
 		transfer_end_received = false;
 	}
 	
+	/**
+	 * @methods is_header()
+	 * @brief check that bytes array is header of device frame
+	 * @param bytes array
+	 * @return true if bytes array is a header of device frame
+	 */
 	private boolean is_header(byte b[]){
 		if(b[0] == header_tab[0]){
 			if(b[1] == header_tab[1]){
@@ -92,16 +105,21 @@ public class AppDataParser {
 			return false;
 	}
 	
+	/**
+	 * @methods parse()
+	 * @brief parse bytes array to relevant data and set flags
+	 * @param bytes array
+	 */
 	public void parse(byte [] b){
 		if((b == null)){
-			this.clear_all_flags();
+			clear_all_flags();
 			return;
 		}
 			
 		if(is_header(b)){
 			Time read_time_data  = new Time();
 			int year;
-			this.clear_all_flags();
+			clear_all_flags();
 			switch(b[3]){
 				case 0:
 					double timestamp = b[5]*60 + b[6];

@@ -1,4 +1,4 @@
-package mvc;
+package mvc.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,11 +18,13 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import mvc.AppController;
+import mvc.Utils;
 import adapters.FileAdapter;
 import adapters.Chart2DAdapter;
 import data.*;
 
-public class AppViewer extends JFrame{
+public class AppViewerView extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -67,7 +69,7 @@ public class AppViewer extends JFrame{
 	private Time stopExamTime = new Time();
 	
 	/** default constructors (all views set) */
-	public AppViewer(){
+	public AppViewerView(){
 		this.setTitle("Viewer Window");
 		this.setSize(1100,620);
 		this.setResizable(true);
@@ -160,94 +162,12 @@ public class AppViewer extends JFrame{
 		appViewerButtonClose.addActionListener(c);
 	}
 	
-	private void parseHeader (String header) {
-		String tmp;
-		int head_index = 0;
-		int tail_index = 0;
-		
-		tail_index = header.indexOf(',', head_index);
-		tmp = header.substring(head_index,tail_index);
-		patient.setName_(tmp);
-		
-		head_index = tail_index + 1;
-		tail_index = header.indexOf(',', head_index);
-		tmp = header.substring(head_index,tail_index);
-		patient.setLast_name_(tmp);
-		
-		head_index = tail_index + 1;
-		tmp = header.substring(head_index,header.length());
-		patient.setID_num_(tmp);
-	}
-	
-	private void parseTime(String line, int source) {
-		String tmp;
-		int head_index = 0;
-		int tail_index = 0;
-		
-		tail_index = line.indexOf(',', head_index);
-		tmp = line.substring(head_index,tail_index);
-		if(source == 1)
-			startExamTime.setYear_(Integer.valueOf(tmp));
-		else if(source == 2)
-			stopExamTime.setYear_(Integer.valueOf(tmp));
-		
-		head_index = tail_index + 1;
-		tail_index = line.indexOf(',', head_index);
-		tmp = line.substring(head_index,tail_index);
-		if(source == 1)
-			startExamTime.setMonth_(Integer.valueOf(tmp));
-		else if(source == 2)
-			stopExamTime.setMonth_(Integer.valueOf(tmp));
-		
-		head_index = tail_index + 1;
-		tail_index = line.indexOf(',', head_index);
-		tmp = line.substring(head_index,tail_index);
-		if(source == 1)
-			startExamTime.setDay_(Integer.valueOf(tmp));
-		else if(source == 2)
-			stopExamTime.setDay_(Integer.valueOf(tmp));
-		
-		head_index = tail_index + 1;
-		tail_index = line.indexOf(',', head_index);
-		tmp = line.substring(head_index,tail_index);
-		if(source == 1)
-			startExamTime.setHour_(Integer.valueOf(tmp));
-		else if(source == 2)
-			stopExamTime.setHour_(Integer.valueOf(tmp));
-		
-		head_index = tail_index + 1;
-		tmp = line.substring(head_index,line.length());
-		if(source == 1)
-			startExamTime.setMinute_(Integer.valueOf(tmp));
-		else if(source == 2)
-			stopExamTime.setMinute_(Integer.valueOf(tmp));
-	}
-	
-	private Sample parseSample (String line){
-		Sample tmp = new Sample();
-		String s_tmp;
-		int head_index = 0;
-		int tail_index = 0;
-		
-		tail_index = line.indexOf(',', head_index);
-		s_tmp = line.substring(head_index,tail_index);
-		
-		tmp.setTimestamp_(Double.valueOf(s_tmp));
-		
-		head_index = tail_index + 1;
-		s_tmp = line.substring(head_index,line.length());
-		
-		tmp.setSignal_sample_(Double.valueOf(s_tmp));
-		
-		return tmp;
-	}
-	
 	private void setInfo (){
 		String tmp = "Patient: " + patient.getName_() + " " + patient.getLast_name_() + " " + patient.getID_num_();
 		appViewerLabelPatient.setText(tmp);
-		tmp = "Exam start: " + startExamTime.getTime();
+		tmp = "Exam start: " + startExamTime.getFullTime();
 		appViewerLabelStartTime.setText(tmp);
-		tmp = "Exam finished: " + stopExamTime.getTime();
+		tmp = "Exam finished: " + stopExamTime.getFullTime();
 		appViewerLabelStopTime.setText(tmp);
 	}
 	
