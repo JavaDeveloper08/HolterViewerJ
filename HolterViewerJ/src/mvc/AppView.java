@@ -11,7 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.*;
 
 import parsers.AppDataParser;
-import adapters.SimpleChartAdapter;
+import adapters.Chart2DAdapter;
 
 public class AppView extends JFrame{
 
@@ -95,12 +95,12 @@ public class AppView extends JFrame{
 	private JLabel appLabelPreviewTime = new JLabel();
 	/* chart */
 	private int appECGTraceMaxSize = 5000;
-	private SimpleChartAdapter appECGChart = new SimpleChartAdapter(appECGTraceMaxSize); 
+	private Chart2DAdapter appECGChart = new Chart2DAdapter(appECGTraceMaxSize); 
 	
 	/** default constructors (all views set) */
 	public AppView(){
 		/** set main view */
-		this.setTitle("Holter Viewer v1.0");
+		this.setTitle("Holter ADS1292 v1.0");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(1200, 720)); 
 		this.setResizable(true);
@@ -451,7 +451,7 @@ public class AppView extends JFrame{
 	}
 	
 	public void addSampleToChart(Sample s){
-		appECGChart.addPoint(s.getSignal_sample_());
+		appECGChart.addPoint(s.getSignal_sample_(),2);
 	}
 	
 	/** getters */

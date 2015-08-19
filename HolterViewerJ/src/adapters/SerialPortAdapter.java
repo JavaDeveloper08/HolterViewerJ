@@ -2,18 +2,23 @@ package adapters;
 
 import jssc.*;
 
-public class COMPortAdapter{
+/**
+ * @class SerialPortAdapter
+ * @brief basic connection application with serial port
+ */
+public class SerialPortAdapter{
 
     private SerialPort serialPort;
     private boolean listening;
   
-    public COMPortAdapter() {      
+    public SerialPortAdapter() {      
         serialPort = null;
         listening= false;
     }
     
     /**
-     * Getting names of available ports.
+     * @methods getPortsNames()
+     * @brief getting names of available ports
      * @return names list
      */
     public String[] getPortsNames() {   
@@ -21,8 +26,9 @@ public class COMPortAdapter{
     }
     
     /**
-     * Connect to specific port with given params.
-     * @param portName - COMM port name
+     * @methods connect()
+     * @brief connect to specific port with given parameters
+     * @param portName - serial port name
      * @param baud - connection baud rate
      * @param dataBits - number of data bits
      * @param stopBits - number of stop bits
@@ -33,12 +39,12 @@ public class COMPortAdapter{
     	serialPort = new SerialPort(portName);
         serialPort.openPort();
         serialPort.setParams(baud, dataBits, stopBits, parity);
-        int mask = SerialPort.MASK_RXCHAR;
-        serialPort.setEventsMask(mask);
+        serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
     }
     
     /**
-     * Closing actual connection.
+     * @methods disconnect()
+     * @brief closing actual port connection
      * @throws SerialPortException
      */
     public void disconnect() throws SerialPortException{
@@ -48,66 +54,62 @@ public class COMPortAdapter{
     }
     
     /**
-     * Getting connection status.
+     * @methods isConnected()
+     * @brief getting connection status
      * @return true if connected, false otherwise
      */
     public boolean isConnected() {
-    	if(this.serialPort == null)
+    	if(serialPort == null)
     		return false;
-    	return this.serialPort.isOpened();
+    	return serialPort.isOpened();
     }
     
     /**
-     * Start listening for data.
+     * @methods startPortListening()
+     * @brief start listening  for data
+     * @param listener - serial port event listener
      * @throws SerialPortException
      */
     public void startPortListening(SerialPortEventListener listener) throws SerialPortException{
-    	if(!this.listening && serialPort != null) {
+    	if(!listening && serialPort != null) {
     		serialPort.readBytes();
     		serialPort.addEventListener(listener);
-    		this.listening = true;
+    		listening = true;
     	}
     }
     
     /**
-     * Stop listening for data.
+     * @methods stopPoartListening()
+     * @brief stop listening for data
      * @throws SerialPortException
      */
     public void stopPortListening() throws SerialPortException {
-    	if(this.listening && serialPort != null) {
+    	if(listening && serialPort != null) {
     		serialPort.removeEventListener();
-    		this.listening = false;
+    		listening = false;
     	}
     }
     
-    public void writeByteToPort(byte b) throws SerialPortException{
-    	if(serialPort != null)
-    		serialPort.writeByte(b);
-    }
-    
     /**
-     * Sending byte array to port.
-     * @param b - data
+     * @methods writeBytesToPort()
+     * @brief sending bytes array to serial port
+     * @param b - bytes array
      * @throws SerialPortException
      */
     public void writeBytesToPort(byte[] b) throws SerialPortException {
-    	if(this.serialPort != null)
-    		this.serialPort.writeBytes(b);
+    	if(serialPort != null)
+    		serialPort.writeBytes(b);
     }
     
     /**
-     * Sending String to port.
-     * @param s - data
-     * @throws SerialPortException
+     * @methods readBytesFromPort()
+     * @brief read bytes array form serial port
+     * @return bytes array
      */
-    public void writeToPort(String s) throws SerialPortException {
-    	this.serialPort.writeString(s);
-    } 
-    
     public byte[] readBytesFromPort(){
     	byte[] b = null;
 		try {
-			b = this.serialPort.readBytes();
+			b = serialPort.readBytes();
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}

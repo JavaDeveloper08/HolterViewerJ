@@ -20,7 +20,7 @@ public class AppModel {
 	private long precentOfData;
 	private Boolean[] device_state = new Boolean[5];
 	
-	private COMPortAdapter PortCOM;
+	private SerialPortAdapter PortCOM;
 	static private int portComBaudrate = 9600;
 	private byte[] comPortCommandFrame = new byte[4];
 	private byte[] comPortTimeFrame = new byte[10];
@@ -44,7 +44,7 @@ public class AppModel {
 		packet_sample = new Vector<Sample>(AppDataParser.getDataSamplesNumber());
 		samples_counter = 0;
 		precentOfData = 0;
-		PortCOM =  new COMPortAdapter();
+		PortCOM =  new SerialPortAdapter();
 		resultFile = new FileAdapter();
 		appParser = new AppDataParser();
 		dataReadyFlag = 0;

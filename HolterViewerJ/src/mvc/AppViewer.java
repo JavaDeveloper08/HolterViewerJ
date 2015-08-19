@@ -19,7 +19,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import adapters.FileAdapter;
-import adapters.SimpleChartAdapter;
+import adapters.Chart2DAdapter;
 import data.*;
 
 public class AppViewer extends JFrame{
@@ -52,7 +52,7 @@ public class AppViewer extends JFrame{
 	public String pathName;
 	/* chart */
 	private int appViewerECGTraceMaxSize = 30000;
-	private SimpleChartAdapter appViewerECGChart = new SimpleChartAdapter(appViewerECGTraceMaxSize);
+	private Chart2DAdapter appViewerECGChart = new Chart2DAdapter(appViewerECGTraceMaxSize);
 	
 	/* load file */
 	private FileAdapter readFile;
@@ -361,7 +361,7 @@ public class AppViewer extends JFrame{
 		
 		appViewerECGChart.clearTraces();
 		for (Sample i:data_sample.get(0)){
-			appViewerECGChart.addPoint(i.getSignal_sample_());
+			appViewerECGChart.addPoint(i.getSignal_sample_(),2);
 		}
 		
 		setSpinnerFrom(startExamTime);
@@ -387,7 +387,7 @@ public class AppViewer extends JFrame{
 				int start = (appViewerTimeFrom.getSecond_() - startExamTime.getSecond_())*sampling_rate;
 				int stop = (appViewerTimeTo.getSecond_() - startExamTime.getSecond_())*sampling_rate;
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
 				}
 			}
 			else if(exam_minute == data_sample.size()-1){
@@ -397,12 +397,12 @@ public class AppViewer extends JFrame{
 					stop = data_sample.get(exam_minute).size();
 				
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
 				}
 			}
 			else {
 				for(int i = appViewerTimeFrom.getSecond_()*500; i<appViewerTimeTo.getSecond_()*500; i++)
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
 			}
 		}
 		else {
@@ -413,14 +413,14 @@ public class AppViewer extends JFrame{
 				int start = (appViewerTimeFrom.getSecond_() - startExamTime.getSecond_())*sampling_rate;
 				int stop = data_sample.get(exam_minute_start).size();
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
 				}
 			}
 			else {
 				int start = appViewerTimeFrom.getSecond_()*sampling_rate;
 				int stop = data_sample.get(exam_minute_start).size();
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
 				}
 			}
 			
@@ -431,14 +431,14 @@ public class AppViewer extends JFrame{
 					stop = data_sample.get(exam_minute_stop).size();
 				
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_stop).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute_stop).get(i).getSignal_sample_(),2);
 				}
 			}
 			else {
 				int start = 0;
 				int stop = appViewerTimeTo.getSecond_()*sampling_rate;
 				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_());
+					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
 				}
 			}
 			
