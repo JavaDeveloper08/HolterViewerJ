@@ -2,6 +2,8 @@ package adapters;
 
 import java.io.*;
 
+import mvc.AppException;
+
 /**
  * @class FileAdapter
  * @brief adapter to file operations provide creating, reading and writing functions
@@ -58,11 +60,11 @@ public class FileAdapter {
      * @methods openToRead()
      * @brief open file to read data
      */
-	public void openToRead(){
+	public void openToRead() throws AppException {
 		try {
 			bufferedReader = new BufferedReader(new FileReader(file));
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new AppException("B³¹d odczytu pliku");
 		}
 	}
 	
@@ -71,12 +73,12 @@ public class FileAdapter {
      * @brief read line from file
      * @return String data line
      */
-	public String readLine(){
+	public String readLine() throws AppException{
 		String line = null;
 		try {
 			line = bufferedReader.readLine();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new AppException("B³¹d odczytu pliku");
 		}
 		return line;
 	}

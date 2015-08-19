@@ -14,13 +14,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import mvc.AppController;
 import mvc.Utils;
-import adapters.FileAdapter;
+import mvc.models.AppViewerModel;
 import adapters.Chart2DAdapter;
 import data.*;
 
@@ -28,47 +26,30 @@ public class AppViewerView extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final int sampling_rate = 500;
-	
 	/* buttons */
 	private JButton appViewerButtonOpenFile = new JButton("Open file");
 	private	JButton appViewerButtonShow = new JButton("Show");
 	private	JButton appViewerButtonClose = new JButton("Close");
+	
 	/* labels */
 	private JLabel appViewerLabelInfo = new JLabel("[Exam information]");
 	private JLabel appViewerLabelPatient = new JLabel();
 	private JLabel appViewerLabelStartTime = new JLabel();
 	private JLabel appViewerLabelStopTime = new JLabel();
-	
 	private JLabel appViewerLabelFrom = new JLabel("From:");
 	private JLabel appViewerLabelTo = new JLabel("To:");
+	
 	/* spinners */
 	private JSpinner appViewerSpinnerFrom = new JSpinner();
 	private JSpinner appViewerSpinnerTo = new JSpinner();
-	/* time */
-	private Time appViewerTimeFrom = new Time();
-	private Time appViewerTimeTo = new Time();
 	
 	/* file chooser */
 	private JFileChooser appFileChooser = new JFileChooser();
-	public String pathName;
+	
 	/* chart */
 	private int appViewerECGTraceMaxSize = 30000;
 	private Chart2DAdapter appViewerECGChart = new Chart2DAdapter(appViewerECGTraceMaxSize);
 	
-	/* load file */
-	private FileAdapter readFile;
-	private Vector<Vector<Sample>> data_sample = new Vector<Vector<Sample>>();
-	private String csvCellSeparator = ",";
-	private String csvLineSeparator = System.lineSeparator();
-	
-	/*patient data */
-	private Patient patient = new Patient();
-	/* time data */
-	private Time startExamTime = new Time();
-	private Time stopExamTime = new Time();
-	
-	/** default constructors (all views set) */
 	public AppViewerView(){
 		this.setTitle("Viewer Window");
 		this.setSize(1100,620);
@@ -136,42 +117,49 @@ public class AppViewerView extends JFrame{
 	}
 	
 	/**
-	 * @fn getSelectedPath()
-	 * @brief get selected file path
+	 * Getters and setters to class fields
+	 */
+	
+	public JButton getAppViewerButtonClose() {
+		return appViewerButtonClose;
+	}
+	
+	
+	/**
+	 * @methods getSelectedPath()
+	 * @brief get selected file path from file chooser
 	 * @return file path
 	 */
 	public String getSelectedPath() {
 		appFileChooser.setFileFilter(new FileNameExtensionFilter("CSV files", "csv"));
 		appFileChooser.setDialogTitle("Choose a file");
 		int returnValue = appFileChooser.showOpenDialog(null);
-		if (returnValue == JFileChooser.APPROVE_OPTION)
-		{
-			 pathName = appFileChooser.getSelectedFile().getPath();
+		if (returnValue == JFileChooser.APPROVE_OPTION){
+			 return appFileChooser.getSelectedFile().getPath();
 		}
-			 	
-		return pathName;
+		return null;
 	}
 
-	public JButton getAppViewerButtonClose() {
-		return appViewerButtonClose;
-	}
-	
-	public void setController(AppController c) {
-		appViewerButtonOpenFile.addActionListener(c);
-		appViewerButtonShow.addActionListener(c);
-		appViewerButtonClose.addActionListener(c);
-	}
-	
-	private void setInfo (){
-		String tmp = "Patient: " + patient.getName_() + " " + patient.getLast_name_() + " " + patient.getID_num_();
+
+	public void setInfo (Patient p, Time start_time, Time stop_time) {
+		String tmp = "Patient: " + p.getName_() + " " + p.getLast_name_() + " " + p.getID_num_();
 		appViewerLabelPatient.setText(tmp);
-		tmp = "Exam start: " + startExamTime.getFullTime();
+		tmp = "Exam start: " + start_time.getFullTime();
 		appViewerLabelStartTime.setText(tmp);
-		tmp = "Exam finished: " + stopExamTime.getFullTime();
+		tmp = "Exam finished: " + stop_time.getFullTime();
 		appViewerLabelStopTime.setText(tmp);
+		
+		setSpinnerFrom(start_time);
+		
+		Time firstEndTime = new Time();
+		firstEndTime.setHour_(start_time.getHour_());
+		firstEndTime.setMinute_(start_time.getMinute_()+1);
+		firstEndTime.setSecond_(0);
+		
+		setSpinnerTo(firstEndTime);
 	}
 	
-	private void setSpinnerFrom (Time time){
+	public void setSpinnerFrom (Time time){
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, time.getHour_());
         calendar.set(Calendar.MINUTE, time.getMinute_());
@@ -193,7 +181,7 @@ public class AppViewerView extends JFrame{
 	}
 	
 	
-	private void setSpinnerTo (Time time){
+	public void setSpinnerTo (Time time){
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, time.getHour_());
         calendar.set(Calendar.MINUTE, time.getMinute_());
@@ -214,158 +202,20 @@ public class AppViewerView extends JFrame{
 		return timeValue;
 	}
 	
-	
-	public void setAppViewerTimeFrom(Time appViewerTimeFrom) {
-		this.appViewerTimeFrom = appViewerTimeFrom;
-	}
-
-	public void setAppViewerTimeTo(Time appViewerTimeTo) {
-		this.appViewerTimeTo = appViewerTimeTo;
-	}
-
-	public void loadData(String file_path){
-		readFile = new FileAdapter(file_path, csvCellSeparator, csvLineSeparator);
-		readFile.openToRead();
-		parseHeader(readFile.readLine());
-		parseTime(readFile.readLine(),1);
-		parseTime(readFile.readLine(),2);
-		
-		String line = "";
-		Boolean data_end = false;
-		Sample sample = new Sample();
-		Vector<Sample> s_vector= new Vector<Sample>();
-		double current_timestamp = startExamTime.getHour_()*60 + startExamTime.getMinute_();
-		while(!data_end){
-			line = readFile.readLine();
-			
-			if(line.equals("END")){
-				data_end = true; 
-				if(!s_vector.isEmpty()){
-					Vector<Sample> tmp = new Vector<Sample>(s_vector);
-					data_sample.add(tmp);
-					s_vector.clear();
-				}
-			}
-			else {
-				sample = parseSample(line);
-				if(sample.getTimestamp_() == current_timestamp){
-					s_vector.add(sample);
-				}
-				else {
-					if(!s_vector.isEmpty()){
-						Vector<Sample> tmp = new Vector<Sample>(s_vector);
-						data_sample.add(tmp);
-						current_timestamp = sample.getTimestamp_();
-						s_vector.clear();
-						s_vector.add(sample);
-					}
-				}
-			}
-		}
-		
-		readFile.close();
-		
-		int seconds_num = 0;
-		seconds_num = 60 - (data_sample.get(0).size()/sampling_rate);
-		if(data_sample.get(0).size()/sampling_rate != 0)
-			seconds_num--;
-		
-		startExamTime.setSecond_(seconds_num);
-		
-		seconds_num = data_sample.lastElement().size()/500;
-		if(data_sample.get(0).size()/500 != 0)
-			seconds_num++;
-		
-		stopExamTime.setSecond_(seconds_num);
-		setInfo();
-		
+	public void upgradeChart(Vector<Sample> signal) {
 		appViewerECGChart.clearTraces();
-		for (Sample i:data_sample.get(0)){
-			appViewerECGChart.addPoint(i.getSignal_sample_(),2);
-		}
-		
-		setSpinnerFrom(startExamTime);
-		
-		Time firstEndTime = new Time();
-		firstEndTime.setHour_(startExamTime.getHour_());
-		firstEndTime.setMinute_(startExamTime.getMinute_()+1);
-		firstEndTime.setSecond_(0);
-		
-		setSpinnerTo(firstEndTime);
-	}
-	
-	//TODO obs³uga b³êdów
-	public void upgradeChart () {
-		
-		if((Utils.timeDiff(appViewerTimeTo, appViewerTimeFrom) > 60) || (Utils.timeDiff(appViewerTimeTo, appViewerTimeFrom) < 0))
-			return;
-		
-		appViewerECGChart.clearTraces();
-		if(appViewerTimeTo.getMinute_() == appViewerTimeFrom.getMinute_()){
-			int exam_minute = Utils.timeDiffWithoutSec(appViewerTimeFrom, startExamTime) / 60;
-			if(exam_minute == 0) {
-				int start = (appViewerTimeFrom.getSecond_() - startExamTime.getSecond_())*sampling_rate;
-				int stop = (appViewerTimeTo.getSecond_() - startExamTime.getSecond_())*sampling_rate;
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
-				}
-			}
-			else if(exam_minute == data_sample.size()-1){
-				int start = appViewerTimeFrom.getSecond_()*sampling_rate;
-				int stop = (appViewerTimeTo.getSecond_() - appViewerTimeFrom.getSecond_())*sampling_rate;
-				if (stop > data_sample.get(exam_minute).size())
-					stop = data_sample.get(exam_minute).size();
-				
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
-				}
-			}
-			else {
-				for(int i = appViewerTimeFrom.getSecond_()*500; i<appViewerTimeTo.getSecond_()*500; i++)
-					appViewerECGChart.addPoint(data_sample.get(exam_minute).get(i).getSignal_sample_(),2);
-			}
-		}
-		else {
-			int exam_minute_start = Utils.timeDiffWithoutSec(appViewerTimeFrom, startExamTime) / 60;
-			int exam_minute_stop = exam_minute_start + 1;
-			
-			if(exam_minute_start == 0) {
-				int start = (appViewerTimeFrom.getSecond_() - startExamTime.getSecond_())*sampling_rate;
-				int stop = data_sample.get(exam_minute_start).size();
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
-				}
-			}
-			else {
-				int start = appViewerTimeFrom.getSecond_()*sampling_rate;
-				int stop = data_sample.get(exam_minute_start).size();
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
-				}
-			}
-			
-			if(exam_minute_stop == data_sample.size()-1) {
-				int start = 0;
-				int stop = appViewerTimeTo.getSecond_()*sampling_rate;
-				if (stop > data_sample.get(exam_minute_stop).size())
-					stop = data_sample.get(exam_minute_stop).size();
-				
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_stop).get(i).getSignal_sample_(),2);
-				}
-			}
-			else {
-				int start = 0;
-				int stop = appViewerTimeTo.getSecond_()*sampling_rate;
-				for(int i = start; i<stop; i++){
-					appViewerECGChart.addPoint(data_sample.get(exam_minute_start).get(i).getSignal_sample_(),2);
-				}
-			}
-			
+		for (Sample i:signal){
+			appViewerECGChart.addPoint(i.getSignal_sample_(),AppViewerModel.getxInterval());
 		}
 	}
 
 	public void clearChart(){
 		appViewerECGChart.clearTraces();
+	}
+	
+	public void setController(AppController c) {
+		appViewerButtonOpenFile.addActionListener(c);
+		appViewerButtonShow.addActionListener(c);
+		appViewerButtonClose.addActionListener(c);
 	}
 }

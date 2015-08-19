@@ -129,7 +129,7 @@ public class SerialPortDataParser {
 						sample = Utils.calculateSignalData(sample);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
-						AppController.getcView().addSampleToChart(tmp);
+						AppController.getMainView().addSampleToChart(tmp);
 					}
 					sample_recevied = true;
 					break;

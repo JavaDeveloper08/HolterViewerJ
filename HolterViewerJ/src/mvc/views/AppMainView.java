@@ -7,13 +7,11 @@ import java.time.LocalDateTime;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.*;
 
 import mvc.AppController;
 import mvc.AppException;
 import mvc.Utils;
-import parsers.SerialPortDataParser;
 import adapters.Chart2DAdapter;
 
 public class AppMainView extends JFrame{
