@@ -4,7 +4,9 @@ import java.awt.EventQueue;
 
 import mvc.*;
 import mvc.models.AppMainModel;
+import mvc.models.AppViewerModel;
 import mvc.views.AppMainView;
+import mvc.views.AppViewerView;
 
 /**
  * @name HolterADS1292
@@ -53,11 +55,14 @@ public class HolterADS1292 {
 		EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-            	AppMainModel model = new AppMainModel();
-				AppMainView view = new AppMainView();
-				AppController controller = new AppController(model, view);
-				view.setController(controller);
-				view.setVisible(true);
+            	AppMainModel mainModel = new AppMainModel();
+				AppMainView mainView = new AppMainView();
+				AppViewerModel viewerModel = new AppViewerModel();
+				AppViewerView viewerView = new AppViewerView();
+				AppController controller = new AppController(mainModel, mainView, viewerModel, viewerView);
+				mainView.setController(controller);
+				viewerView.setController(controller);
+				mainView.setVisible(true);
             }
         });
 	}

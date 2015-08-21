@@ -6,43 +6,37 @@ import mvc.models.AppMainModel;
 import mvc.models.AppViewerModel;
 import mvc.views.AppMainView;
 import mvc.views.AppViewerView;
+
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
+
+/**
+ * @class AppController
+ * @brief class representing application control. Implements user interaction, model and views update.
+ * @implements ActionListener, SerialPortEventListener
+ */
 
 public class AppController implements ActionListener, SerialPortEventListener {
 	private AppMainModel cMainModel = null;
 	private AppViewerModel cViewerModel = null;
-	private static AppMainView cMainView = null;
+	private AppMainView cMainView = null;
 	private AppViewerView cViewerView = null;
 	
-	private static final int STREAM_DATA_CMD = 1;
-	private static final int SAVE_DATA_CMD = 2;
-	private static final int DOWNLOAD_DATA_CMD = 3;
-	private static final int ERASE_DATA_CMD = 4;
-	private static final int GET_STATE_CMD = 6;
-	
-	private int progressBarValue;
-	
-	public AppController (AppMainModel model, AppMainView view){
-		this.cMainModel = model;
-		this.cMainView = view;
-		this.cViewerModel = new AppViewerModel();
-		this.cViewerView = new AppViewerView();
+	/** parameterized constructors */
+	public AppController (AppMainModel mmodel, AppMainView mview, AppViewerModel vmodel, AppViewerView vview){
+		this.cMainModel = mmodel;
+		this.cMainView = mview;
 		this.cMainModel.setController(this);
+		this.cViewerModel = vmodel;
+		this.cViewerView = vview;
 		this.cViewerModel.setController(this);
-		progressBarValue = 0;
-	}
-	
-	public void setControllerToViewer() {
-		this.cViewerModel.setController(this);
-		this.cViewerView.setController(this);
-		this.cViewerView.setViewerFrameVisible();
-	}
-	
-	public static AppMainView getMainView() {
-		return cMainView;
 	}
 
+	/**
+	 * @fn actionPerformed()
+	 * @brief action event handler
+	 * @param action event
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
@@ -52,6 +46,8 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "Close":
 				if(actionSource == cViewerView.getAppViewerButtonClose()){
 					cViewerView.clearChart();
+					cViewerView.clearViewer();
+					cViewerModel.dataClear();
 					cViewerView.dispose();
 				}
 				else
@@ -63,7 +59,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			
 			case "Viewer":
-				this.setControllerToViewer();
+				this.cViewerView.setViewerFrameVisible();
 				break;
 			
 			case "Clear":
@@ -76,7 +72,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			case "Open Port":
 				cMainModel.open(cMainView.getUserPort());
 				cMainView.openPortAction();
-				cMainModel.sendCommands(GET_STATE_CMD, 1);
+				cMainModel.sendCommands(cMainModel.getGetStateCmd(), 1);
 				break;
 			case "Close Port":
 				cMainModel.close();
@@ -85,16 +81,16 @@ public class AppController implements ActionListener, SerialPortEventListener {
 			
 			case "Stream data":
 				if(cMainView.getAppButtonDataStream().isSelected() == true)
-					cMainModel.sendCommands(STREAM_DATA_CMD, 1);	
+					cMainModel.sendCommands(cMainModel.getStreamDataCmd(), 1);	
 				else
-					cMainModel.sendCommands(STREAM_DATA_CMD, 0);
+					cMainModel.sendCommands(cMainModel.getStreamDataCmd(), 0);
 				break;
 				
 			case "Save data":
 				if(cMainView.getAppButtonDataSave().isSelected() == true)
-					cMainModel.sendCommands(SAVE_DATA_CMD, 1);
+					cMainModel.sendCommands(cMainModel.getSaveDataCmd(), 1);
 				else
-					cMainModel.sendCommands(SAVE_DATA_CMD, 0);
+					cMainModel.sendCommands(cMainModel.getSaveDataCmd(), 0);
 				break;
 				
 			case "Download":
@@ -104,9 +100,8 @@ public class AppController implements ActionListener, SerialPortEventListener {
 					cMainModel.setPatient(cMainView.readPatientView());
 					cMainModel.writePatientdDataToFile();
 					cMainModel.setDownloadDataFlag(1);
-					cMainView.setProgressBarValue(0);
-					progressBarValue = 0;
-					cMainModel.sendCommands(DOWNLOAD_DATA_CMD, 1);
+					cMainView.setProgressBarInc(0);
+					cMainModel.sendCommands(cMainModel.getDownloadDataCmd(), 1);
 					} catch (AppException exception){
 						cMainView.getAppButtonDataLoad().setSelected(false);
 						exception.show_exception(); 
@@ -120,7 +115,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			
 			case "Erase data":
-				cMainModel.sendCommands(ERASE_DATA_CMD, 1);
+				cMainModel.sendCommands(cMainModel.getEraseDataCmd(), 1);
 				break;
 			
 			case "Time send":
@@ -128,7 +123,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				break;
 			
 			case "Get state":
-				cMainModel.sendCommands(GET_STATE_CMD, 1);
+				cMainModel.sendCommands(cMainModel.getGetStateCmd(), 1);
 				break;
 			
 			case "Open file":
@@ -152,21 +147,29 @@ public class AppController implements ActionListener, SerialPortEventListener {
 		}
 	}
 
+	/**
+	 * @fn serialEvent()
+	 * @brief serial port event handler
+	 * @param serial port event
+	 */
 	@Override
 	public void serialEvent(SerialPortEvent e) {
 		if (e.isRXCHAR()) {
 			cMainModel.readBytes();
 			if(cMainModel.getDataReadyFlag() == 1){
 				cMainView.setTimeView(cMainModel.calculate_current_time());
-				if((cMainModel.getDownloadDataFlag() == 1) && (cMainModel.getSamples_counter() > cMainModel.getPrecentOfData())) {
+				if(cMainModel.getDownloadDataFlag() == 0){
+					cMainView.addSampleToChart(cMainModel.getPacket_sample());
+				}
+				else if((cMainModel.getDownloadDataFlag() == 1) && (cMainModel.getSamples_counter() > cMainModel.getPrecentOfData())) {
 					cMainModel.setSamples_counter(0);
-					cMainView.setProgressBarValue(++progressBarValue);
+					cMainView.setProgressBarInc(1);
 				}
 			}
 			
 			if(cMainModel.getDownloadDataFlag() == 2){
 				cMainModel.setDownloadDataFlag(0);
-				cMainView.setProgressBarValue(100);
+				cMainView.setProgressBarInc(2);
 				cMainView.set_download_state(false);
 			}
 			
@@ -177,8 +180,8 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				cMainView.set_stream_state(cMainModel.getDevice_state()[0]);
 				cMainView.set_run_state(cMainModel.getDevice_state()[1]);
 				cMainView.set_save_state(cMainModel.getDevice_state()[2]);
+				cMainView.set_error_state(cMainModel.getDevice_state()[3]);
 			}
 		}
-		
 	}
 }

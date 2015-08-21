@@ -122,14 +122,13 @@ public class SerialPortDataParser {
 			clear_all_flags();
 			switch(b[3]){
 				case 0:
-					double timestamp = b[5]*60 + b[6];
+					int timestamp = b[5]*60 + b[6];
 					sample_data.clear();
 					for(int i=0; i<data_samples_number; i++){
 						double sample = (int)(b[i*2+7] << 8) + ((b[i*2+8]) & 0xFF);
 						sample = Utils.calculateSignalData(sample);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
-						AppController.getMainView().addSampleToChart(tmp);
 					}
 					sample_recevied = true;
 					break;
@@ -138,7 +137,7 @@ public class SerialPortDataParser {
 					device_state |= b[4]; //stream
 					device_state |= b[5] << 1; //run
 					device_state |= b[6] << 2; //save
-					device_state |= b[7] << 4; //error
+					device_state |= b[7] << 3; //error
 					
 					read_time_data.setDay_(b[8]);
 					read_time_data.setMonth_(b[9]);

@@ -139,7 +139,7 @@ public class Time {
 	 * @return date in string
 	 */
 	public String getDate() {
-		return year_ + "/" + month_ + "/" + "/" + day_;
+		return year_ + "/" + month_ + "/" + day_;
 	}
 	
 	/**
@@ -148,7 +148,7 @@ public class Time {
 	 * @return full time in string
 	 */
 	public String getFullTime() {
-		return year_ + "/" + month_ + "/" + "/" + day_ + " " + hour_ + ":" + minute_ + ":" + second_;
+		return year_ + "/" + month_ + "/" + day_ + " " + hour_ + ":" + minute_ + ":" + second_;
 	}
 
 	/**

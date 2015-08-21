@@ -133,8 +133,8 @@ public class AppViewerModel {
 		
 		startExamTime.setSecond_(seconds_num);
 		
-		seconds_num = data_sample.lastElement().size()/500;
-		if(data_sample.get(0).size()/500 != 0)
+		seconds_num = data_sample.lastElement().size()/sampling_rate;
+		if(data_sample.get(0).size()/sampling_rate != 0)
 			seconds_num++;
 		
 		stopExamTime.setSecond_(seconds_num);
@@ -152,13 +152,16 @@ public class AppViewerModel {
 	public Vector<Sample> findSignalPeriod (Time from_time, Time to_time) throws AppException{
 		TimeFrom = from_time;
 		TimeTo = to_time;
-		data_view_sample.removeAllElements();
+		data_view_sample.clear();
 		
-		if((Utils.timeDiff(TimeTo, TimeFrom) > 60) || (Utils.timeDiff(TimeTo, TimeFrom) < 0))
+		if((Utils.timeDiffSec(TimeTo, TimeFrom) > 60) || (Utils.timeDiffSec(TimeTo, TimeFrom) < 0))
 			throw new AppException ("Podanno b³êdy czas sygna³u (0-1min)");
 		
+		if(data_sample.isEmpty())
+			throw new AppException("Brak danych do wyœwietlenia");
+		
 		if(TimeTo.getMinute_() == TimeFrom.getMinute_()){
-			int exam_minute = Utils.timeDiffWithoutSec(TimeFrom, startExamTime) / 60;
+			int exam_minute = Utils.timeDiffMin(TimeFrom, startExamTime) / 60;
 			if(exam_minute == 0) {
 				int start = (TimeFrom.getSecond_() - startExamTime.getSecond_())*sampling_rate;
 				int stop = (TimeTo.getSecond_() - startExamTime.getSecond_())*sampling_rate;
@@ -177,12 +180,12 @@ public class AppViewerModel {
 				}
 			}
 			else {
-				for(int i = TimeFrom.getSecond_()*500; i<TimeTo.getSecond_()*500; i++)
+				for(int i = TimeFrom.getSecond_()*sampling_rate; i<TimeTo.getSecond_()*sampling_rate; i++)
 					data_view_sample.add(data_sample.get(exam_minute).get(i));
 			}
 		}
 		else {
-			int exam_minute_start = Utils.timeDiffWithoutSec(TimeFrom, startExamTime) / 60;
+			int exam_minute_start = Utils.timeDiffMin(TimeFrom, startExamTime) / 60;
 			int exam_minute_stop = exam_minute_start + 1;
 			
 			if(exam_minute_start == 0) {
@@ -222,4 +225,8 @@ public class AppViewerModel {
 		return data_view_sample;
 	}
 	
+	public void dataClear() {
+		data_sample.clear();
+		data_view_sample.clear();
+	}	
 }

@@ -120,7 +120,7 @@ public class FileDataParser {
 		tail_index = line.indexOf(',', head_index);
 		s_tmp = line.substring(head_index,tail_index);
 		
-		tmp.setTimestamp_(Double.valueOf(s_tmp));
+		tmp.setTimestamp_(Integer.valueOf(s_tmp));
 		
 		head_index = tail_index + 1;
 		s_tmp = line.substring(head_index,line.length());

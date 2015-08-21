@@ -1,20 +1,26 @@
 package mvc.views;
 
-import data.*;
-
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.text.*;
 
+import data.*;
 import mvc.AppController;
 import mvc.AppException;
 import mvc.Utils;
 import adapters.Chart2DAdapter;
 
-public class AppMainView extends JFrame{
+/**
+ * @class AppMainView
+ * @brief class representing main application views. Contains all GUI components and presented graphically AppModel class
+ * @extends JFrame class
+ */
+
+public class AppMainView extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,8 +36,16 @@ public class AppMainView extends JFrame{
 	private StyleContext appAboutStyleContext = new StyleContext();
 	private DefaultStyledDocument appAboutStyleDoc = new DefaultStyledDocument(appAboutStyleContext);
 	private JTextPane appAboutTextPane = new JTextPane(appAboutStyleDoc);
-	//TODO dokoñczyæ about
-	public static final String appAboutText = "HolterViewer\n";
+	public static final String appAboutText = "HolterADS1292 v.1.0\n\nAuthor: Artur Tynecki\n\n"
+			+ "It is simple application for control HolterADS1292 by serial port.\n\n" 
+			+ "Application allows:\n"
+			+ "1. live stream date from device\n"
+			+ "2. save backup on device\n"
+			+ "3. erase all data form backup on device\n"
+			+ "4. send current time to device\n"
+			+ "5. get and display device state\n"
+			+ "6. download backup form device and write to CSV file with patient data\n"
+			+ "7. viewing data from CSV file by Viewer application";
 	
 	/** main window panels */
 	private JSplitPane MainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -82,6 +96,10 @@ public class AppMainView extends JFrame{
 	private JCheckBox appCheckBoxRun = new JCheckBox("Run",false);
 	private JCheckBox appCheckBoxStream = new JCheckBox("Stream",false);
 	private JCheckBox appCheckBoxSave = new JCheckBox("Save",false);
+	private ImageIcon correctIcon = new ImageIcon("images/icon_correct.gif");
+	private ImageIcon errorIcon = new ImageIcon("images/icon_error.png");
+	/* label */
+	private JLabel appLabelError = new JLabel();
 	
 	/** download panel */
 	/*labels */
@@ -103,15 +121,15 @@ public class AppMainView extends JFrame{
 		/** set main view */
 		this.setTitle("Holter ADS1292 v1.0");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setMinimumSize(new Dimension(1200, 720)); 
+		this.setMinimumSize(new Dimension(1280, 720)); 
 		this.setResizable(true);
 		this.setLocationRelativeTo(null);
 		this.getContentPane().setLayout(new GridBagLayout());
 
 		/** set menu view */
 		appMenuBar.add(appMenu);
-		appMenu.add(appMenuAbout);
 		appMenu.add(appMenuViewer);
+		appMenu.add(appMenuAbout);
 		appMenu.add(appMenuClose);
 		setJMenuBar(appMenuBar);
 		
@@ -136,7 +154,7 @@ public class AppMainView extends JFrame{
 		
 	    appLeftPanel.setLayout(new GridBagLayout());
 	    
-	    appLeftSplitPane.setDividerLocation(240);
+	    appLeftSplitPane.setDividerLocation(220);
 	    appLeftSplitPane.setEnabled(false);
 	    appLeftSplitPane.setTopComponent(appPatientPanel);  
 	    appLeftSplitPane.setBottomComponent(appActionPanel); 
@@ -179,17 +197,21 @@ public class AppMainView extends JFrame{
 		JPanel Srow1 = new JPanel(new FlowLayout());
 		JPanel Srow2 = new JPanel(new FlowLayout());
 		JPanel Srow3 = new JPanel(new FlowLayout());
+		JPanel Srow4 = new JPanel(new FlowLayout());
 		
+		appLabelError.setEnabled(false);
 		appCheckBoxRun.setEnabled(false);
 		appCheckBoxSave.setEnabled(false);
 		appCheckBoxStream.setEnabled(false);
-		Srow1.add(appCheckBoxRun);
-		Srow2.add(appCheckBoxSave);
-		Srow3.add(appCheckBoxStream);
+		Srow1.add(appLabelError);
+		Srow2.add(appCheckBoxRun);
+		Srow3.add(appCheckBoxSave);
+		Srow4.add(appCheckBoxStream);
 		
 		appStatePanel.add(Srow1);
 		appStatePanel.add(Srow2);
 		appStatePanel.add(Srow3);
+		appStatePanel.add(Srow4);
 		
 		appActionDownPanel.add(appStatePanel, BorderLayout.PAGE_START);
 		appActionDownPanel.add(appDownloadDataPanel);
@@ -252,7 +274,7 @@ public class AppMainView extends JFrame{
 		appPatientDataPanel.setLayout(new GridBagLayout());
 		
 		GridBagConstraints d = new GridBagConstraints();
-		d.insets = new Insets(15, 5, 15, 5);
+		d.insets = new Insets(10, 5, 10, 5);
 		d.gridx = 0;
 		d.gridy = 0;
 		d.ipady = 10;
@@ -308,9 +330,28 @@ public class AppMainView extends JFrame{
 		appPreviewPanel.add(appECGChart.getChartPanel(), BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Getters to class fields
+	 */
+	public JToggleButton getAppButtonDataLoad() {
+		return appButtonDataLoad;
+	}
+
+	public JToggleButton getAppButtonDataStream() {
+		return appButtonDataStream;
+	}
+
+	public JToggleButton getAppButtonDataSave() {
+		return appButtonDataSave;
+	}
+	
 	/** ABOUT FRAME */
+	/**
+	 * @methods setAboutFrame()
+	 * @brief create and display about frame
+	 */
 	public JFrame setAboutFrame() {
-		appAboutFrame.setSize(300,300);
+		appAboutFrame.setSize(350,320);
 		appAboutFrame.setResizable(true);
 		appAboutFrame.setLocationRelativeTo(null);
 		appAboutFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -338,7 +379,7 @@ public class AppMainView extends JFrame{
 	/** PATIENT VIEW */
 	
 	/**
-	 * @fn readPatientView()
+	 * @methods readPatientView()
 	 * @brief read data from patient view
 	 * @return patient object
 	 * @throws AppException
@@ -371,7 +412,7 @@ public class AppMainView extends JFrame{
 	}
 	
 	/**
-	 * @fn cleanPatientView()
+	 * @methods cleanPatientView()
 	 * @brief clean patient view
 	 */
 	public void cleanPatientView() {
@@ -381,6 +422,11 @@ public class AppMainView extends JFrame{
 	}
 	
 	/** ACTION VIEW */
+	/**
+	 * @methods setPortNames()
+	 * @brief set serial port names to combo box
+	 * @param String array with serial port names
+	 */
 	public void setPortNames(String[] tab) {
 		appComboBoxPortName.removeAllItems();
 		for (int i = 0; i < tab.length; i++) {
@@ -388,34 +434,91 @@ public class AppMainView extends JFrame{
 		}
 	}
 	
+	/**
+	 * @methods getUserPort()
+	 * @brief get selected serial port name
+	 * @return selected serial port name
+	 */
 	public String getUserPort() {
 		return (String) appComboBoxPortName.getSelectedItem();
 	}
 	
-	public void openPortAction(){
+	/**
+	 * @methods openPortAction()
+	 * @brief change view after open serial port
+	 */
+	public void openPortAction() {
 		appButtonClosePort.setEnabled(true);
 		appButtonOpenPort.setEnabled(false);
 		appLabelPortOpen.setVisible(true);
 	}
 	
-	public void closePortAction(){
+	/**
+	 * @methods closePortAction()
+	 * @brief change view after close serial port
+	 */
+	public void closePortAction() {
 		appButtonOpenPort.setEnabled(true);
 		appButtonClosePort.setEnabled(false);
 		appLabelPortOpen.setVisible(false);
+		
+		appLabelError.setIcon(null);
+		appLabelError.setEnabled(false);
+		appCheckBoxRun.setSelected(false);
+		appCheckBoxRun.setEnabled(false);
+		appCheckBoxSave.setSelected(false);
+		appCheckBoxSave.setEnabled(false);
+		appCheckBoxStream.setSelected(false);
+		appCheckBoxStream.setEnabled(false);
+		
+		appButtonDataStream.setSelected(false);
+		appButtonDataSave.setSelected(false);
 	}
 	
 	/** STATE VIEW */
+	
+	/**
+	 * @methods set_error_state()
+	 * @brief set view of error device
+	 * @param state - true if device error
+	 */
+	public void set_error_state (boolean state){
+		if(state == false){
+			appLabelError.setEnabled(true);
+			appLabelError.setIcon(correctIcon);
+		}
+		else {
+			appLabelError.setEnabled(true);
+			appLabelError.setIcon(errorIcon);;
+		}
+	}
+	
+	/**
+	 * @methods set_run_state()
+	 * @brief set view of device run
+	 * @param state - true if device run
+	 */
 	public void set_run_state (boolean state){
 		appCheckBoxRun.setSelected(state);
 		appCheckBoxRun.setEnabled(state);
 	}
 	
+	/**
+	 * @methods set_save_state()
+	 * @brief set view of device in save data mode
+	 * @param state - true if device in save data mode
+	 */
 	public void set_save_state (boolean state){
 		appCheckBoxSave.setSelected(state);
 		appCheckBoxSave.setEnabled(state);
 		appButtonDataSave.setSelected(state);
 	}
 	
+	/**
+	 * @methods set_stream_state()
+	 * @brief set view of device in stream data mode
+	 * @param state - true if device in stream data mode
+	 */
 	public void set_stream_state (boolean state){
 		appCheckBoxStream.setSelected(state);
 		appCheckBoxStream.setEnabled(state);
@@ -423,51 +526,83 @@ public class AppMainView extends JFrame{
 	}
 	
 	/** DOWNLOAD VIEW */
+	/**
+	 * @methods set_download_state()
+	 * @brief set view of device in download data mode
+	 * @param state - true if device in download data mode
+	 */
 	public void set_download_state (boolean state){
 		appButtonDataLoad.setSelected(state);
 	}
 	
+	/**
+	 * @methods getFileName()
+	 * @brief get result file name
+	 * @return result file name
+	 * @throws AppException
+	 */
 	public String getFileName() throws AppException {
 		if(appTextFileName.getText().isEmpty())
 			throw new AppException("Podaj nazwê docelowego pliku");
 		return appTextFileName.getText();
 	}
 	
-	public void setProgressBarValue (int value) {
-		if (value > 100)
-			appProgressBar.setValue(100);
-		else if (value < 0)
-			appProgressBar.setValue(100);
+	/**
+	 * @methods setProgressBarInc()
+	 * @brief increment progress bar, set max or min value
+	 * @param value - vale code (0 - min value; 1 - increment value; 2 - max value)
+	 */
+	public void setProgressBarInc (int value) {
+		int state = appProgressBar.getValue();
+		if(value == 0)
+			appProgressBar.setValue(0);
+		else if (value == 1) {
+			state++;
+			if(state > 100)
+				appProgressBar.setValue(100);
+			else
+				appProgressBar.setValue(state);
+		}
 		else
-			appProgressBar.setValue(value);
+			appProgressBar.setValue(100);
 	}
 	
 	/** PREVIEW VIEW */
+	
+	/**
+	 * @methods setDateView()
+	 * @brief set current date view
+	 * @param current time object
+	 */
 	public void setDateView(Time date){
-		appLabelPreviewDate.setText(date.getYear_() + "/" + date.getMonth_() + "/" + date.getDay_());
+		appLabelPreviewDate.setText(date.getDate());
 	}
 	
+	/**
+	 * @methods setTimeView()
+	 * @brief set current time view
+	 * @param current time object
+	 */
 	public void setTimeView(Time date){
-		appLabelPreviewTime.setText(date.getHour_() + "/" + date.getMinute_() + "/" +date.getSecond_());
+		appLabelPreviewTime.setText(date.getTime());
 	}
 	
-	public void addSampleToChart(Sample s){
-		appECGChart.addPoint(s.getSignal_sample_(),2);
-	}
-	
-	/** getters */
-	public JToggleButton getAppButtonDataLoad() {
-		return appButtonDataLoad;
-	}
-
-	public JToggleButton getAppButtonDataStream() {
-		return appButtonDataStream;
+	/**
+	 * @methods addSampleToChart()
+	 * @brief add signal sample to preview chart
+	 * @param vector of samples
+	 */
+	public void addSampleToChart(Vector<Sample> vs){
+		for(Sample s:vs){
+			appECGChart.addPoint(s.getSignal_sample_(),2);
+		}
 	}
 
-	public JToggleButton getAppButtonDataSave() {
-		return appButtonDataSave;
-	}
-
+	/**
+	 * @methods setController()
+	 * @brief set controller to class components
+	 * @param application controller
+	 */
 	public void setController(AppController c) {
 		appMenuAbout.addActionListener(c);
 		appMenuClose.addActionListener(c);

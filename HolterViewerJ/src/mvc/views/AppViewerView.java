@@ -74,8 +74,8 @@ public class AppViewerView extends JFrame{
 		JPanel Vcolumn4 = new JPanel(new FlowLayout());
 		JPanel Vcolumn5 = new JPanel(new FlowLayout());
 		
-		appViewerSpinnerFrom = Utils.crateTimeSpinner(appViewerSpinnerFrom);
-		appViewerSpinnerTo = Utils.crateTimeSpinner(appViewerSpinnerTo);
+		appViewerSpinnerFrom = Utils.createTimeSpinner(appViewerSpinnerFrom);
+		appViewerSpinnerTo = Utils.createTimeSpinner(appViewerSpinnerTo);
 		
 		Vcolumn1.add(appViewerButtonOpenFile);
 		Vcolumn2.add(Utils.createLabelTextFieldPanel(appViewerLabelFrom, appViewerSpinnerFrom, 10));
@@ -211,6 +211,20 @@ public class AppViewerView extends JFrame{
 
 	public void clearChart(){
 		appViewerECGChart.clearTraces();
+	}
+	
+	public void clearViewer(){
+		appViewerLabelPatient.setText("");
+		appViewerLabelStartTime.setText("");
+		appViewerLabelStopTime.setText("");
+		
+		Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 24);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        
+        appViewerSpinnerFrom.getModel().setValue(calendar.getTime());
+        appViewerSpinnerTo.getModel().setValue(calendar.getTime());
 	}
 	
 	public void setController(AppController c) {

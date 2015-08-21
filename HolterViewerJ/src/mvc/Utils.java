@@ -9,7 +9,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.text.DateFormatter;
 
@@ -17,13 +16,13 @@ import data.*;
 
 /**
  * @class Utils
- * @brief class contains static utils methods for application
+ * @brief class contains static auxiliary methods for application
  */
 
 public class Utils {
 	
 	/**
-	 * @fn isText()
+	 * @methods isText()
 	 * @brief check if string line contain text
 	 * @param string line
 	 * @return true if line contain text
@@ -43,7 +42,7 @@ public class Utils {
 	}
 	
 	/**
-	 * @fn isNumber()
+	 * @methods isNumber()
 	 * @brief check if string line contain number
 	 * @param string line
 	 * @return true if line contain number
@@ -58,6 +57,14 @@ public class Utils {
 		return true;
 	}
 	
+	/**
+	 * @methods createLabelTextFieldPanel()
+	 * @brief create Label + TextField panel from components
+	 * @param label component
+	 * @param text field component
+	 * @param gap - gap between components
+	 * @return panel contain Label + TextField
+	 */
 	public static JPanel createLabelTextFieldPanel (JLabel label, Component text, int gap) {
 		JPanel p = new JPanel();
 		Dimension gapSize = new Dimension(gap,0);
@@ -68,7 +75,14 @@ public class Utils {
 		return p;
 	}
 	
-	public static int timeDiff (Time t1, Time t2){
+	/**
+	 * @methods timeDiffSec()
+	 * @brief calculate difference between two times object in seconds
+	 * @param first time
+	 * @param second time
+	 * @return time difference
+	 */
+	public static int timeDiffSec (Time t1, Time t2){
 		int diff = 0;
 		
 		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60 + (t1.getSecond_() - t2.getSecond_());
@@ -76,7 +90,14 @@ public class Utils {
 		return diff;
 	}
 	
-	public static int timeDiffWithoutSec (Time t1, Time t2){
+	/**
+	 * @methods timeDiffMin()
+	 * @brief calculate difference between two times object in minutes
+	 * @param first time
+	 * @param second time
+	 * @return time difference
+	 */
+	public static int timeDiffMin (Time t1, Time t2){
 		int diff = 0;
 		
 		diff = (t1.getHour_() - t2.getHour_())*3600 + (t1.getMinute_() - t2.getMinute_())*60;
@@ -84,7 +105,13 @@ public class Utils {
 		return diff;
 	}
 	
-	public static JSpinner crateTimeSpinner (JSpinner spin){
+	/**
+	 * @methods createTimeSpinner()
+	 * @brief create time model spinner
+	 * @param spinner object
+	 * @return spinner object with time model
+	 */
+	public static JSpinner createTimeSpinner (JSpinner spin){
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
         calendar.set(Calendar.MINUTE, 0);
@@ -103,10 +130,17 @@ public class Utils {
 	    return spin;
 	}
 	
+	/**
+	 * @methods calculateSignalData()
+	 * @brief conversion raw signal to real value in mV
+	 * @param raw signal sample
+	 * @return real signal value
+	 */
 	private static final long referance_value = 2420;
 	private static final long scope_value = 0x7FFF;
 	public static double calculateSignalData (double sample) {
 		double csample = 0;
+		int tmp = 0;
 		
 		if(sample > 0){
 			if (sample == scope_value)
@@ -121,6 +155,8 @@ public class Utils {
 				csample = (referance_value * sample) / scope_value;
 		}
 		
-		return csample;
+		tmp = (int)(csample*100);
+		
+		return ((double)(tmp))/100;
 	}
 }
