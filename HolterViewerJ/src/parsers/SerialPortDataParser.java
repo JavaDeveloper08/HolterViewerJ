@@ -11,22 +11,24 @@ import mvc.*;
  */
 public class SerialPortDataParser {
 	private Time time_data;
+	private Time start_time;
+	private Time stop_time;
 	private Vector<Sample> sample_data;
 	private static final byte[] header_tab = new byte[] {(byte)(0xA5), 0x5A, (byte)(0xFE)};
 	private static final int data_samples_number = 30;
 	private Boolean sample_recevied;
-	private Boolean start_time_received;
-	private Boolean stop_time_received;
+	private Boolean header_time_received;
 	private int device_state;
 	private Boolean state_received;
 	private Boolean transfer_end_received;
 	
 	public SerialPortDataParser(){
 		time_data = new Time();
+		start_time = new Time();
+		stop_time = new Time();
 		sample_data = new Vector<Sample>(data_samples_number);
 		sample_recevied = false;
-		start_time_received = false;
-		stop_time_received = false;
+		header_time_received = false;
 		device_state = 0;
 		state_received = false;
 		transfer_end_received = false;
@@ -38,6 +40,18 @@ public class SerialPortDataParser {
 	public Time getTime_data() {
 		return time_data;
 	}
+	
+	public Time getStop_time() {
+		return stop_time;
+	}
+	
+	public Time getStart_time() {
+		return start_time;
+	}
+	
+	public Time getStop_time_data() {
+		return stop_time;
+	}
 
 	public Vector<Sample> getSample_data() {
 		return sample_data;
@@ -47,14 +61,10 @@ public class SerialPortDataParser {
 		return sample_recevied;
 	}
 	
-	public Boolean getStart_time_received() {
-		return start_time_received;
+	public Boolean getHeader_time_received() {
+		return header_time_received;
 	}
 
-	public Boolean getStop_time_received() {
-		return stop_time_received;
-	}
-	
 	public Boolean getState_received() {
 		return state_received;
 	}
@@ -77,8 +87,7 @@ public class SerialPortDataParser {
 	 */
 	private void clear_all_flags() {
 		sample_recevied = false;
-		start_time_received = false;
-		stop_time_received = false;
+		header_time_received = false;
 		device_state = 0;
 		state_received = false;
 		transfer_end_received = false;
@@ -152,30 +161,26 @@ public class SerialPortDataParser {
 					break;
 					
 				case 2:
-					read_time_data.setDay_(b[4]);
-					read_time_data.setMonth_(b[5]);
+					start_time.setDay_(b[4]);
+					start_time.setMonth_(b[5]);
 					year = (((int)(b[6] & 0xFF)) << 8) | ((int)(b[7])) & 0xFF;
-					read_time_data.setYear_(year);
-					read_time_data.setHour_((int)(b[8] & 0xFF));
-					read_time_data.setMinute_((int)(b[9] & 0xFF));
-					read_time_data.setSecond_((int)(b[10] & 0xFF));
-					time_data = read_time_data;
-					start_time_received = true;
-					break;
-				
-				case 3:
-					read_time_data.setDay_(b[4]);
-					read_time_data.setMonth_(b[5]);
-					year = (((int)(b[6] & 0xFF)) << 8) | ((int)(b[7])) & 0xFF;
-					read_time_data.setYear_(year);
-					read_time_data.setHour_((int)(b[8] & 0xFF));
-					read_time_data.setMinute_((int)(b[9] & 0xFF));
-					read_time_data.setSecond_((int)(b[10] & 0xFF));
-					time_data = read_time_data;
-					stop_time_received = true;
+					start_time.setYear_(year);
+					start_time.setHour_((int)(b[8] & 0xFF));
+					start_time.setMinute_((int)(b[9] & 0xFF));
+					start_time.setSecond_((int)(b[10] & 0xFF));
+					
+					stop_time.setDay_(b[11]);
+					stop_time.setMonth_(b[12]);
+					year = (((int)(b[13] & 0xFF)) << 8) | ((int)(b[14])) & 0xFF;
+					stop_time.setYear_(year);
+					stop_time.setHour_((int)(b[15] & 0xFF));
+					stop_time.setMinute_((int)(b[16] & 0xFF));
+					stop_time.setSecond_((int)(b[17] & 0xFF));
+					
+					header_time_received = true;
 					break;
 					
-				case 4:
+				case 3:
 					transfer_end_received = true;
 					break;
 			}

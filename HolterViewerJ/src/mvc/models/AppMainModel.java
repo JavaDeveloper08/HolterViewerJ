@@ -287,15 +287,15 @@ public class AppMainModel {
 			set_state(appParser.getDevice_state());
 			getStateFlag = true;
 		}
-		else if (appParser.getStart_time_received() == true){
-			start_exam_time = appParser.getTime_data();
+		else if (appParser.getHeader_time_received() == true){
+			start_exam_time = appParser.getStart_time();
 			resultFile.writeLine(start_exam_time.toString());
-		}
-		else if (appParser.getStop_time_received() == true){
-			stop_exam_time = appParser.getTime_data();
+			
+			stop_exam_time = appParser.getStop_time();
 			resultFile.writeLine(stop_exam_time.toString());
+			
 			precentOfData = calculate_progressive_bar_step(stop_exam_time, start_exam_time);
-		}	
+		}
 		else if(appParser.getTransfer_end_received() == true){
 			writeEndFileMarker();
 			closeFile();
