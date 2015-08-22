@@ -138,7 +138,7 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				
 			case "Show":
 				try {
-					cViewerModel.findSignalPeriod(cViewerView.getTimeSpinnerFrom(), cViewerView.getTimeSpinnerTo());
+					cViewerModel.findSignalSection(cViewerView.getTimeSpinnerFrom(), cViewerView.getTimeSpinnerTo());
 				}catch (AppException exception){
 					exception.show_exception(); 
 				}

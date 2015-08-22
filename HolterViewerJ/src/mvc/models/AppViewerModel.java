@@ -2,19 +2,28 @@ package mvc.models;
 
 import java.util.Vector;
 
+import data.*;
+import adapters.FileAdapter;
 import parsers.FileDataParser;
+
 import mvc.AppController;
 import mvc.AppException;
 import mvc.Utils;
-import adapters.FileAdapter;
-import data.*;
+
+/**
+ * @class AppViewerModel
+ * @brief class representing all Viewer application date, application state and allows access to them
+ */
 
 public class AppViewerModel {
-	private AppController controller;
-	
+	/** Global variables */
 	private static final int sampling_rate = 500;
 	private static final int x_interval = 1000/sampling_rate;
 	
+	/** Controller*/
+	private AppController controller;
+	
+	/** Data */
 	private Patient patient;
 	private Vector<Vector<Sample>> data_sample;
 	private Vector<Sample> data_view_sample;
@@ -24,12 +33,16 @@ public class AppViewerModel {
 	private Time TimeFrom;
 	private Time TimeTo;
 	
+	/** COMMUNICATION */
+	/* File */
 	private FileAdapter readFile;
 	private String csvCellSeparator = ",";
 	private String csvLineSeparator = System.lineSeparator();
 	
+	/* Parser */
 	private FileDataParser dataParser;
 	
+	/** default constructors */
 	public AppViewerModel(){
 		controller = null;
 		patient = new Patient();
@@ -74,6 +87,12 @@ public class AppViewerModel {
 		return data_view_sample;
 	}
 
+	/**
+	 * @methods loadData()
+	 * @brief load data from file to program
+	 * @param path to load file
+	 * @throws AppException
+	 */
 	public void loadData(String file_path)  throws AppException{
 		readFile = new FileAdapter(file_path, csvCellSeparator, csvLineSeparator);
 		try{
@@ -149,7 +168,15 @@ public class AppViewerModel {
 			throw new AppException("Brak danych w pliku");
 	}
 	
-	public Vector<Sample> findSignalPeriod (Time from_time, Time to_time) throws AppException{
+	/**
+	 * @methods findSignalSection()
+	 * @brief find the section of the signal from time 1 to time 2
+	 * @param from time - start signal
+	 * @param to_time - stop signal
+	 * @return vector of section of the signal
+	 * @throws AppException
+	 */
+	public Vector<Sample> findSignalSection (Time from_time, Time to_time) throws AppException{
 		TimeFrom = from_time;
 		TimeTo = to_time;
 		data_view_sample.clear();
@@ -225,6 +252,10 @@ public class AppViewerModel {
 		return data_view_sample;
 	}
 	
+	/**
+	 * @methods dataClear()
+	 * @brief clear signal data objects
+	 */
 	public void dataClear() {
 		data_sample.clear();
 		data_view_sample.clear();

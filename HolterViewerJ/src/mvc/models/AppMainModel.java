@@ -38,7 +38,6 @@ public class AppMainModel {
 	/* Parser */
 	private SerialPortDataParser appParser;
 	
-	
 	/* Commands */
 	private final int STREAM_DATA_CMD = 1;
 	private final int SAVE_DATA_CMD = 2;
@@ -232,7 +231,7 @@ public class AppMainModel {
 	 * @methods sendTime()
 	 * @brief send current system time to device
 	 */
-	public void sendTime (){
+	public void sendTime() {
 		LocalDateTime localTime = LocalDateTime.now();
 		comPortTimeFrame[2] = (byte)(TIME_DATA_CMD);
 		comPortTimeFrame[3] = (byte)(localTime.getSecond());

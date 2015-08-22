@@ -16,22 +16,27 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import mvc.AppController;
-import mvc.Utils;
-import mvc.models.AppViewerModel;
-import adapters.Chart2DAdapter;
 import data.*;
+import adapters.Chart2DAdapter;
+import mvc.*;
+import mvc.models.AppViewerModel;
+
+/**
+ * @class AppViewerView
+ * @brief class representing Viewer application views. Contains all GUI components and presented graphically AppModel class
+ * @extends JFrame class
+ */
 
 public class AppViewerView extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	
-	/* buttons */
+	/** buttons */
 	private JButton appViewerButtonOpenFile = new JButton("Open file");
 	private	JButton appViewerButtonShow = new JButton("Show");
 	private	JButton appViewerButtonClose = new JButton("Close");
 	
-	/* labels */
+	/** labels */
 	private JLabel appViewerLabelInfo = new JLabel("[Exam information]");
 	private JLabel appViewerLabelPatient = new JLabel();
 	private JLabel appViewerLabelStartTime = new JLabel();
@@ -39,17 +44,18 @@ public class AppViewerView extends JFrame{
 	private JLabel appViewerLabelFrom = new JLabel("From:");
 	private JLabel appViewerLabelTo = new JLabel("To:");
 	
-	/* spinners */
+	/** spinners */
 	private JSpinner appViewerSpinnerFrom = new JSpinner();
 	private JSpinner appViewerSpinnerTo = new JSpinner();
 	
-	/* file chooser */
+	/** file chooser */
 	private JFileChooser appFileChooser = new JFileChooser();
 	
-	/* chart */
+	/** chart */
 	private int appViewerECGTraceMaxSize = 30000;
 	private Chart2DAdapter appViewerECGChart = new Chart2DAdapter(appViewerECGTraceMaxSize);
 	
+	/** default constructors */
 	public AppViewerView(){
 		this.setTitle("Viewer Window");
 		this.setSize(1100,620);
@@ -112,14 +118,17 @@ public class AppViewerView extends JFrame{
 		this.add(appViewerInfoBar, BorderLayout.PAGE_START);
 	}
 	
+	/**
+	 * @methods setViewerFrameVisible()
+	 * @brief visible viewer frame
+	 */
 	public void setViewerFrameVisible() {
 		this.setVisible(true);	
 	}
 	
 	/**
 	 * Getters and setters to class fields
-	 */
-	
+	 */	
 	public JButton getAppViewerButtonClose() {
 		return appViewerButtonClose;
 	}
@@ -140,7 +149,13 @@ public class AppViewerView extends JFrame{
 		return null;
 	}
 
-
+	/**
+	 * @methods setInfo()
+	 * @brief set exam information to view: patient, start and stop exam time
+	 * @param patient data
+	 * @param start exam time
+	 * @param stop exam time
+	 */
 	public void setInfo (Patient p, Time start_time, Time stop_time) {
 		String tmp = "Patient: " + p.getName_() + " " + p.getLast_name_() + " " + p.getID_num_();
 		appViewerLabelPatient.setText(tmp);
@@ -159,7 +174,12 @@ public class AppViewerView extends JFrame{
 		setSpinnerTo(firstEndTime);
 	}
 	
-	public void setSpinnerFrom (Time time){
+	/**
+	 * @methods setSpinnerFrom()
+	 * @brief set time to spinner start time
+	 * @param time to set
+	 */
+	public void setSpinnerFrom (Time time) {
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, time.getHour_());
         calendar.set(Calendar.MINUTE, time.getMinute_());
@@ -168,7 +188,12 @@ public class AppViewerView extends JFrame{
 		appViewerSpinnerFrom.getModel().setValue(calendar.getTime());
 	}
 	
-	public Time getTimeSpinnerFrom(){
+	/**
+	 * @methods getTimeSpinnerFrom()
+	 * @brief get time from spinner start time
+	 * @return set time
+	 */
+	public Time getTimeSpinnerFrom() {
 		Time timeValue = new Time();
 		java.util.Date time = new Date(0);
 		
@@ -180,8 +205,12 @@ public class AppViewerView extends JFrame{
 		return timeValue;
 	}
 	
-	
-	public void setSpinnerTo (Time time){
+	/**
+	 * @methods setSpinnerTo()
+	 * @brief set time to spinner stop time
+	 * @param time to set
+	 */
+	public void setSpinnerTo (Time time) {
 		Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, time.getHour_());
         calendar.set(Calendar.MINUTE, time.getMinute_());
@@ -190,7 +219,12 @@ public class AppViewerView extends JFrame{
 		appViewerSpinnerTo.getModel().setValue(calendar.getTime());
 	}
 	
-	public Time getTimeSpinnerTo(){
+	/**
+	 * @methods getTimeSpinnerTo()
+	 * @brief get time from spinner stop time
+	 * @return set time
+	 */
+	public Time getTimeSpinnerTo() {
 		Time timeValue = new Time();
 		java.util.Date time = new Date(0);
 		
@@ -202,6 +236,11 @@ public class AppViewerView extends JFrame{
 		return timeValue;
 	}
 	
+	/**
+	 * @methods upgradeChart()
+	 * @brief set signal data to chart view
+	 * @param vector of signal
+	 */
 	public void upgradeChart(Vector<Sample> signal) {
 		appViewerECGChart.clearTraces();
 		for (Sample i:signal){
@@ -209,10 +248,18 @@ public class AppViewerView extends JFrame{
 		}
 	}
 
+	/**
+	 * @methods clearChart()
+	 * @brief clear chart view
+	 */
 	public void clearChart(){
 		appViewerECGChart.clearTraces();
 	}
 	
+	/**
+	 * @methods clearViewer()
+	 * @brief clear view of application
+	 */
 	public void clearViewer(){
 		appViewerLabelPatient.setText("");
 		appViewerLabelStartTime.setText("");
@@ -227,6 +274,11 @@ public class AppViewerView extends JFrame{
         appViewerSpinnerTo.getModel().setValue(calendar.getTime());
 	}
 	
+	/**
+	 * @methods setController()
+	 * @brief set controller to class components
+	 * @param application controller
+	 */
 	public void setController(AppController c) {
 		appViewerButtonOpenFile.addActionListener(c);
 		appViewerButtonShow.addActionListener(c);
