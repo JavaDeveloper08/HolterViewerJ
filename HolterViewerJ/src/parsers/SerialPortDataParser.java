@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import data.*;
 import mvc.*;
+import processing.*;
 
 /**
  * @class SerialPortDataParser
@@ -22,6 +23,8 @@ public class SerialPortDataParser {
 	private Boolean state_received;
 	private Boolean transfer_end_received;
 	
+	private IIRfilter filter;
+	
 	public SerialPortDataParser(){
 		time_data = new Time();
 		start_time = new Time();
@@ -32,6 +35,7 @@ public class SerialPortDataParser {
 		device_state = 0;
 		state_received = false;
 		transfer_end_received = false;
+		filter = new IIRfilter(3,new double[] {0.9991, -1.9982, 0.9991}, new double[] {1.000, -1.9982, 0.9982});
 	}
 
 	/**
@@ -135,6 +139,8 @@ public class SerialPortDataParser {
 					sample_data.clear();
 					for(int i=0; i<data_samples_number; i++){
 						double sample = (int)(b[i*2+7] << 8) + ((b[i*2+8]) & 0xFF);
+						filter.add(sample);
+						sample = filter.get();
 						sample = Utils.calculateSignalData(sample);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
