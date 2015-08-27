@@ -57,6 +57,7 @@ public class AppMainView extends JFrame {
 	private JPanel appComPortPanel = new JPanel();
 	private JPanel appCommandPanel = new JPanel();
 	private JPanel appDownloadDataPanel = new JPanel();
+	private JPanel appFilterPanel = new JPanel();
 	private JPanel appStatePanel = new JPanel();
 	private JPanel appPreviewPanel = new JPanel();
 	
@@ -108,6 +109,10 @@ public class AppMainView extends JFrame {
 	private JTextField appTextFileName = new JTextField(15);
 	private JProgressBar appProgressBar = new JProgressBar();
 	
+	/** filter panel */
+	private JCheckBox appCheckBoxFilterDC = new JCheckBox("DC",false);
+	private JCheckBox appCheckBoxFilter50Hz = new JCheckBox("50Hz",false);
+	
 	/** preview panel */
 	/* labels */
 	private JLabel appLabelPreviewDate = new JLabel();
@@ -140,6 +145,7 @@ public class AppMainView extends JFrame {
 		appStatePanel.setBorder(BorderFactory.createTitledBorder("Device state"));
 		appCommandPanel.setBorder(BorderFactory.createTitledBorder("Command"));
 		appDownloadDataPanel.setBorder(BorderFactory.createTitledBorder("Download"));
+		appFilterPanel.setBorder(BorderFactory.createTitledBorder("Filter"));
 		appPreviewPanel.setBorder(BorderFactory.createTitledBorder("ECG signal"));
 		
 		MainPanel.setDividerLocation(400);
@@ -192,6 +198,8 @@ public class AppMainView extends JFrame {
 		appDownloadDataPanel.add(DOrow1);
 		appDownloadDataPanel.add(DOrow3);
 		
+		appActionDownPanel.add(appDownloadDataPanel);
+		
 		/* state view panel */
 		appStatePanel.setLayout(new BoxLayout(appStatePanel, BoxLayout.X_AXIS));
 		JPanel Srow1 = new JPanel(new FlowLayout());
@@ -214,7 +222,16 @@ public class AppMainView extends JFrame {
 		appStatePanel.add(Srow4);
 		
 		appActionDownPanel.add(appStatePanel, BorderLayout.PAGE_START);
-		appActionDownPanel.add(appDownloadDataPanel);
+
+		/* filter view panel */
+		appFilterPanel.setLayout(new BoxLayout(appFilterPanel, BoxLayout.Y_AXIS));
+		appFilterPanel.add(Box.createRigidArea(new Dimension(0,15)));
+		appFilterPanel.add(appCheckBoxFilterDC);
+		appFilterPanel.add(Box.createRigidArea(new Dimension(0,15)));
+		appFilterPanel.add(appCheckBoxFilter50Hz);
+		
+		appActionDownPanel.add(appFilterPanel, BorderLayout.EAST);
+		
 		appActionPanel.add(appActionDownPanel, BorderLayout.PAGE_END);
 		
 		JPanel appActionUpPanel = new JPanel(new GridLayout(1,2));
@@ -345,6 +362,14 @@ public class AppMainView extends JFrame {
 		return appButtonDataSave;
 	}
 	
+	public JCheckBox getAppCheckBoxFilterDC() {
+		return appCheckBoxFilterDC;
+	}
+
+	public JCheckBox getAppCheckBoxFilter50Hz() {
+		return appCheckBoxFilter50Hz;
+	}
+
 	/** ABOUT FRAME */
 	/**
 	 * @methods setAboutFrame()
@@ -617,5 +642,7 @@ public class AppMainView extends JFrame {
 		appButtonDataErase.addActionListener(c);
 		appButtonSendTime.addActionListener(c);
 		appButtonGetState.addActionListener(c);
+		appCheckBoxFilterDC.addActionListener(c);
+		appCheckBoxFilter50Hz.addActionListener(c);
 	}
 }

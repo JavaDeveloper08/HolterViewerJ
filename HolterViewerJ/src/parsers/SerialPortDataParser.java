@@ -23,7 +23,10 @@ public class SerialPortDataParser {
 	private Boolean state_received;
 	private Boolean transfer_end_received;
 	
-	private IIRfilter filter;
+	private IIRfilter filterDC;
+	private Boolean filterDC_enable;
+	private IIRfilter filter50Hz;
+	private Boolean filter50Hz_enable;
 	
 	public SerialPortDataParser(){
 		time_data = new Time();
@@ -35,7 +38,10 @@ public class SerialPortDataParser {
 		device_state = 0;
 		state_received = false;
 		transfer_end_received = false;
-		filter = new IIRfilter(3,new double[] {0.9991, -1.9982, 0.9991}, new double[] {1.000, -1.9982, 0.9982});
+		filterDC = new IIRfilter(3,new double[] {0.9991, -1.9982, 0.9991}, new double[] {1.000, -1.9982, 0.9982});
+		filter50Hz = new IIRfilter(3, new double[] {0.9695, -1.5687,  0.9695}, new double[] {1.0000, -1.5687, 0.9391});
+		filterDC_enable = false;
+		filter50Hz_enable = false;
 	}
 
 	/**
@@ -83,6 +89,14 @@ public class SerialPortDataParser {
 	
 	public static int getDataSamplesNumber() {
 		return data_samples_number;
+	}
+
+	public void setFilterDC_enable(Boolean filterDC_enable) {
+		this.filterDC_enable = filterDC_enable;
+	}
+
+	public void setFilter50Hz_enable(Boolean filter50Hz_enable) {
+		this.filter50Hz_enable = filter50Hz_enable;
 	}
 
 	/**
@@ -139,9 +153,23 @@ public class SerialPortDataParser {
 					sample_data.clear();
 					for(int i=0; i<data_samples_number; i++){
 						double sample = (int)(b[i*2+7] << 8) + ((b[i*2+8]) & 0xFF);
-						filter.add(sample);
-						sample = filter.get();
 						sample = Utils.calculateSignalData(sample);
+						if(filterDC_enable == true && filter50Hz_enable == false){
+							filterDC.add(sample);
+							sample = filterDC.get();
+						}
+						
+						else if(filter50Hz_enable == true && filterDC_enable == false) {
+							filter50Hz.add(sample);
+							sample = filter50Hz.get();
+						}
+						
+						else if (filterDC_enable == true && filter50Hz_enable == true) {
+							filterDC.add(sample);
+							filter50Hz.add(filterDC.get());
+							sample = filter50Hz.get();
+						}
+						
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
 					}

@@ -89,7 +89,11 @@ public class AppMainModel {
 	public void setController(AppController c){
 		this.controller = c;
 	}
-	
+
+	public SerialPortDataParser getAppParser() {
+		return appParser;
+	}
+
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}

@@ -144,6 +144,13 @@ public class AppController implements ActionListener, SerialPortEventListener {
 				}
 				cViewerView.upgradeChart(cViewerModel.getData_view_sample());
 				break;
+				
+			case "DC":
+				cMainModel.getAppParser().setFilterDC_enable(cMainView.getAppCheckBoxFilterDC().isSelected());
+				break;
+			case "50Hz":
+				cMainModel.getAppParser().setFilter50Hz_enable(cMainView.getAppCheckBoxFilter50Hz().isSelected());
+				break;
 		}
 	}
 
