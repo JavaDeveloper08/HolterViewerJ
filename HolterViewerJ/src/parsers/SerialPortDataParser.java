@@ -170,6 +170,7 @@ public class SerialPortDataParser {
 							sample = filter50Hz.get();
 						}
 						
+						sample = Utils.toDouble2Precision(sample);
 						Sample tmp = new Sample(sample, timestamp);
 						sample_data.add(tmp);
 					}

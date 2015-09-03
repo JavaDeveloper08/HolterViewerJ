@@ -140,7 +140,6 @@ public class Utils {
 	private static final long scope_value = 0x7FFF;
 	public static double calculateSignalData (double sample) {
 		double csample = 0;
-		int tmp = 0;
 		
 		if(sample > 0){
 			if (sample == scope_value)
@@ -155,8 +154,14 @@ public class Utils {
 				csample = (referance_value * sample) / scope_value;
 		}
 		
-		tmp = (int)(csample*100);
-		
-		return ((double)(tmp))/100;
+		return csample;
+	}
+	
+	public static double toDouble2Precision (double s){
+		int tmp;
+		double ret;
+		tmp = (int)(s*100);
+		ret = ((double)(tmp))/100;
+		return ret;
 	}
 }
